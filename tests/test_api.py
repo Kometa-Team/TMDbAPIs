@@ -2,12 +2,12 @@ import os, unittest
 
 from tmdbapis import NotFound, Movie, Person, TVShow
 from tmdbapis.tmdb import TMDbAPIs
-
+"""
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
-
+"""
 class APITests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -89,15 +89,15 @@ class APITests(unittest.TestCase):
 
     def test_list(self):
         test_list = self.api.create_list("PMM Test", "en", load=True)
-        test_list.add_items((524434, "movie"))
+        test_list.add_items([(524434, "movie")])
         test_list.reload()
         self.assertGreater(len(test_list), 0)
-        self.assertTrue(test_list.has_item(524434, "movie"))
-        test_list.remove_items((524434, "movie"))
-        self.assertFalse(test_list.has_item(524434, "movie"))
-        test_list.add_items((524434, "movie"))
+        self.assertTrue(test_list.has_item((524434, "movie")))
+        test_list.remove_items([(524434, "movie")])
+        self.assertFalse(test_list.has_item((524434, "movie")))
+        test_list.add_items([(524434, "movie")])
         test_list.clear()
-        self.assertFalse(test_list.has_item(524434, "movie"))
+        self.assertFalse(test_list.has_item((524434, "movie")))
         test_list.reload()
         self.assertEqual(len(test_list), 0)
         test_list.delete()
