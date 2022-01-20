@@ -6,7 +6,7 @@ Welcome to TMDbAPIs Documentation!
     :alt: Read the Docs
 
 .. image:: https://img.shields.io/github/v/release/meisnate12/TMDbAPIs?style=plastic
-    :target: https://github.com/meisnate12/TMDbAPI/releases
+    :target: https://github.com/meisnate12/TMDbAPIs/releases
     :alt: GitHub release (latest by date)
 
 .. image:: https://img.shields.io/pypi/v/TMDbAPIs?style=plastic

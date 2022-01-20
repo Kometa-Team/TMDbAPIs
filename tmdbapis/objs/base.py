@@ -240,7 +240,7 @@ class TMDbObj(ABC):
             elif value["media_type"] == "person":
                 return tmdbapis.objs.reload.Person(self._tmdb, value)
         elif value_type == "list":
-            return tmdbapis.objs.pagination.List(self._tmdb, value)
+            return tmdbapis.objs.pagination.TMDbList(self._tmdb, value)
         elif value_type == "movie_reviews":
             return tmdbapis.objs.pagination.MovieReviews(self._tmdb, value, key)
         elif value_type == "lists":
