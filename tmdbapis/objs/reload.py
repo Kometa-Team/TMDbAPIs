@@ -440,12 +440,14 @@ class Keyword(TMDbReload):
         Attributes:
             id (int): Keyword ID.
             name (str): Keyword Name.
-            movies (List[:class:`~tmdbapis.objs.reload.Movie`]): Keyword Movies.
-            tv_shows (List[:class:`~tmdbapis.objs.reload.TVShow`]): Keyword TV Shows.
+            movies (:class:`~tmdbapis.objs.pagination.DiscoverMovies`): Keyword Movies.
+            tv_shows (:class:`~tmdbapis.objs.pagination.DiscoverTVShows`): Keyword TV Shows.
     """
 
     def _load(self, data):
         super()._load(data)
+        self._movies = None
+        self._tv_shows = None
         self.id = self._parse(attrs="id", value_type="int")
         self.name = self._parse(attrs="name")
         self._finish(self.name)
@@ -455,11 +457,15 @@ class Keyword(TMDbReload):
 
     @property
     def movies(self):
-        return self._api.discover_movie_discover(with_keywords=self.id)
+        if not self._movies:
+            self._movies = self._tmdb.discover_movies(with_keywords=self.id)
+        return self._movies
 
     @property
     def tv_shows(self):
-        return self._api.discover_tv_discover(with_keywords=self.id)
+        if not self._tv_shows:
+            self._tv_shows = self._tmdb.discover_tv_shows(with_keywords=self.id)
+        return self._tv_shows
 
 
 class Movie(TMDbReload, Favorite, Rate, Watchlist):
@@ -614,11 +620,12 @@ class Network(TMDbReload):
             logo_url (str): Logo Full URL.
             logos (List[:class:`~tmdbapis.objs.image.Logo`]): List of other Logos for the Network.
             name (str): Network Name.
-            tv_shows (List[:class:`~tmdbapis.objs.reload.TVShow`]): Network TV Shows.
+            tv_shows (:class:`~tmdbapis.objs.pagination.DiscoverTVShows`): Network TV Shows.
     """
 
     def _load(self, data):
         super()._load(data)
+        self._tv_shows = None
         self.alternative_names = self._parse(attrs=["alternative_names", "results"],
                                              value_type="alternative_name", is_list=True)
         self.country = self._parse(attrs="origin_country", value_type="country")
@@ -636,7 +643,9 @@ class Network(TMDbReload):
 
     @property
     def tv_shows(self):
-        return self._api.discover_tv_discover(with_networks=self.id)
+        if not self._tv_shows:
+            self._tv_shows = self._tmdb.discover_tv_shows(with_networks=self.id)
+        return self._tv_shows
 
 
 class Person(TMDbReload):
