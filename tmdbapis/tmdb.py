@@ -76,25 +76,20 @@ class TMDbAPIs:
         return self._tv_genre_lookups
 
     def _get_object(self, lookup, obj_type):
-        if isinstance(lookup, dict):
-            if obj_type == "country" and "iso_3166_1" in lookup:
-                lookup = lookup["iso_3166_1"]
-            elif obj_type == "language" and "iso_639_1" in lookup:
-                lookup = lookup["iso_639_1"]
-            elif obj_type in ["movie_genre", "tv_genre"] and "id" in lookup:
-                lookup = lookup["id"]
-            else:
-                return None
-        if not lookup:
-            return None
+        def object_check(lookup_obj, key, lookup_dict, is_int=False):
+            if isinstance(lookup_obj, dict) and key in lookup_obj:
+                lookup_obj = lookup_obj[key]
+            return lookup_dict[int(lookup_obj) if is_int else lookup_obj] if lookup_obj in lookup_dict else None
         if obj_type == "country":
-            return self._iso_3166_1[lookup]
+            return object_check(lookup, "iso_3166_1", self._iso_3166_1)
         elif obj_type == "language":
-            return self._iso_639_1[lookup]
+            return object_check(lookup, "iso_639_1", self._iso_639_1)
         elif obj_type == "movie_genre":
-            return self._movie_genre_lookup[int(lookup)]
+            return object_check(lookup, "id", self._movie_genre_lookup, is_int=True)
         elif obj_type == "tv_genre":
-            return self._tv_genre_lookup[int(lookup)]
+            return object_check(lookup, "id", self._tv_genre_lookup, is_int=True)
+        else:
+            return None
 
     @property
     def language(self):
