@@ -77,9 +77,11 @@ class TMDbAPIs:
 
     def _get_object(self, lookup, obj_type):
         def object_check(lookup_obj, key, lookup_dict, is_int=False):
-            if isinstance(lookup_obj, dict) and key in lookup_obj:
-                lookup_obj = lookup_obj[key]
-            return lookup_dict[int(lookup_obj) if is_int else lookup_obj] if lookup_obj in lookup_dict else None
+            if isinstance(lookup_obj, dict):
+                lookup_obj = lookup_obj[key] if key in lookup_obj else None
+            if is_int:
+                lookup_obj = int(lookup_obj)
+            return lookup_dict[lookup_obj] if lookup_obj in lookup_dict else None
         if obj_type == "country":
             return object_check(lookup, "iso_3166_1", self._iso_3166_1)
         elif obj_type == "language":
