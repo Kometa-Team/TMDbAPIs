@@ -2041,7 +2041,7 @@ class API3:
             f"/tv/{tv_id}",
             language=language,
             append_to_response=append_to_response,
-            session_id=session_id if session_id else self.session_id,
+            session_id=session_id if session_id else self._session_id,
             guest_session_id=guest_session_id,
             start_date=start_date,
             end_date=end_date,
@@ -2435,7 +2435,7 @@ class API3:
             f"/tv/{tv_id}/season/{season_number}",
             language=language,
             append_to_response=append_to_response,
-            session_id=session_id if session_id else self.session_id,
+            session_id=session_id if session_id else self._session_id,
             guest_session_id=guest_session_id,
             include_image_language=include_image_language,
             include_video_language=include_video_language
@@ -2629,7 +2629,7 @@ class API3:
             f"/tv/{tv_id}/season/{season_number}/episode/{episode_number}",
             language=language,
             append_to_response=append_to_response,
-            session_id=session_id if session_id else self.session_id,
+            session_id=session_id if session_id else self._session_id,
             guest_session_id=guest_session_id,
             include_image_language=include_image_language,
             include_video_language=include_video_language
