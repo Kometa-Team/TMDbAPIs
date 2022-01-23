@@ -310,12 +310,18 @@ class Credit(TMDbReload):
         self.popularity = self._parse(attrs=dict_check("person", "popularity"), value_type="int")
         self.profile_path = self._parse(attrs=dict_check("person", "profile_path"))
         self.profile_url = self._image_url(self.profile_path)
-        if self.media_type == "movie":
-            self.movie = self._parse(attrs="media", value_type="movie")
-        elif self.media_type == "tv":
-            self.tv_show = self._parse(attrs="media", value_type="tv")
-            self.seasons = self._parse(attrs=["media", "seasons"], value_type="season", is_list=True)
-            self.episodes = self._parse(attrs=["media", "episodes"], value_type="episode", is_list=True)
+        if "media" in self._data:
+            if self.media_type == "movie":
+                self.movie = self._parse(attrs="media", value_type="movie")
+            elif self.media_type == "tv":
+                self.tv_show = self._parse(attrs="media", value_type="tv")
+                self.seasons = self._parse(attrs=["media", "seasons"], value_type="season", is_list=True)
+                self.episodes = self._parse(attrs=["media", "episodes"], value_type="episode", is_list=True)
+        elif "credit_id" in self._data:
+            if self.media_type == "movie":
+                self.movie = self._tmdb.movie(self._parse(attrs="id", value_type="int"), load=False)
+            elif self.media_type == "tv":
+                self.tv_show = self._tmdb.tv_show(self._parse(attrs="id", value_type="int"), load=False)
 
     def _full_load(self):
         return self._api.credits_get_details(self.id)
