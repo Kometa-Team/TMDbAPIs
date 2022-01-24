@@ -86,7 +86,7 @@ def validate_discover(is_movie, **kwargs):
         if is_movie and k not in discover_movie_options or not is_movie and k not in discover_tv_options:
             raise Invalid(f"{k} is not a valid parameter")
         elif k == "sort_by":
-            if is_movie and k not in discover_movie_sort_options or not is_movie and k not in discover_tv_sort_options:
+            if is_movie and v not in discover_movie_sort_options or not is_movie and v not in discover_tv_sort_options:
                 raise Invalid(f"{v} is not a valid sort_by option")
             validated[k] = v
         elif k == "region":
