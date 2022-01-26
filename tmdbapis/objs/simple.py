@@ -21,15 +21,15 @@ class AlternativeTitle(TMDbObj):
     """ Represents a single Alternative Title.
 
         Attributes:
-            name (str): Alternative Title.
+            title (str): Alternative Title.
             type (str): Type of Alternative Title.
     """
 
     def _load(self, data):
         super()._load(data)
-        self.name = self._parse(attrs="name")
+        self.title = self._parse(attrs="title")
         self.type = self._parse(attrs="type")
-        self._finish(self.name)
+        self._finish(self.title)
 
 
 class Certification(TMDbObj):

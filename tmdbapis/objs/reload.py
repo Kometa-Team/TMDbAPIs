@@ -349,6 +349,7 @@ class Episode(TMDbReload, Rate):
             still_path (str): Still Path.
             still_url (str): Still Full URL.
             stills (List[:class:`~tmdbapis.objs.image.Still`]): List of other Stills for the Episode.
+            title (str): alias of name.
             translations (List[:class:`~tmdbapis.objs.simple.Translation`]): List of Translations for the Episode.
             tv_id (int): TMDb TV Show ID the contains the Episode.
             tvdb_id (int): TVDB ID of the Episode.
@@ -385,6 +386,7 @@ class Episode(TMDbReload, Rate):
         self.still_path = self._parse(attrs="still_path")
         self.still_url = self._image_url(self.still_path)
         self.stills = self._parse(attrs=["images", "stills"], value_type="still", is_list=True)
+        self.title = self.name
         self.translations = self._parse(attrs=["translations", "translations"], value_type="translation", is_list=True)
         self.tv_id = self._parse(attrs="show_id", value_type="int") if self._tv_id is None else self._tv_id
         self.tvdb_id = self._parse(attrs=["external_ids", "tvdb_id"], value_type="int")
@@ -500,6 +502,7 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
             spoken_languages (List[:class:`~tmdbapis.objs.simple.Language`]): List of Spoken Languages for the Movie.
             lists (:class:`~tmdbapis.objs.pagination.MovieLists`): Pagination Object of Lists containing the Movie.
             logos (List[:class:`~tmdbapis.objs.image.Logo`]): List of other Logos for the Movie.
+            name (str): alias of title.
             original_language (:class:`~tmdbapis.objs.simple.Language`): Original Language of the Movie.
             original_title (str): Movie's Original Title.
             overview (str): Movie Overview.
@@ -580,6 +583,7 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
         self.status = self._parse(attrs="status")
         self.tagline = self._parse(attrs="tagline")
         self.title = self._parse(attrs="title")
+        self.name = self.title
         self.trailers = self._parse(attrs=["trailers", "youtube"], value_type="trailer", is_list=True)
         self.translations = self._parse(attrs=["translations", "translations"], value_type="translation", is_list=True)
         self.twitter_id = self._parse(attrs=["external_ids", "twitter_id"])
@@ -791,6 +795,7 @@ class Season(TMDbReload):
             posters (List[:class:`~tmdbapis.objs.image.Poster`]): List of other Posters for the Season.
             overview (str): Season Overview.
             season_number (int): Season Number.
+            title (str): alias of name.
             translations (List[:class:`~tmdbapis.objs.simple.Translation`]): List of Translations for the Season.
             tv_id (int): TMDb TV Show ID the contains the Season.
             tvdb_id (int): TVDB ID of the Season.
@@ -820,6 +825,7 @@ class Season(TMDbReload):
         self.poster_url = self._image_url(self.poster_path)
         self.posters = self._parse(attrs=["images", "posters"], value_type="poster", is_list=True)
         self.season_number = self._parse(attrs="season_number", value_type="int")
+        self.title = self.name
         self.translations = self._parse(attrs=["translations", "translations"], value_type="translation", is_list=True)
         self.tvdb_id = self._parse(attrs=["external_ids", "tvdb_id"], value_type="int")
         self.tvrage_id = self._parse(attrs=["external_ids", "tvrage_id"], value_type="int")
@@ -890,6 +896,7 @@ class TVShow(TMDbReload, Favorite, Rate, Watchlist):
             spoken_languages (List[:class:`~tmdbapis.objs.simple.Language`]): List of Spoken Languages for the TV Show.
             status (str): TV Show's Status.
             tagline (str): TV Show's Tagline.
+            title (str): alias of name.
             translations (List[:class:`~tmdbapis.objs.simple.Translation`]): List of Translations for the TV Show.
             tvdb_id (int): TVDB ID of the TV Show.
             tvrage_id (int): TV Rage ID of the TV Show.
@@ -958,6 +965,7 @@ class TVShow(TMDbReload, Favorite, Rate, Watchlist):
         self.spoken_languages = self._parse(attrs="spoken_languages", value_type="language", is_list=True)
         self.status = self._parse(attrs="status")
         self.tagline = self._parse(attrs="tagline")
+        self.title = self.name
         self.translations = self._parse(attrs=["translations", "translations"], value_type="translation", is_list=True)
         self.tvdb_id = self._parse(attrs=["external_ids", "tvdb_id"], value_type="int")
         self.tvrage_id = self._parse(attrs=["external_ids", "tvrage_id"], value_type="int")
