@@ -548,12 +548,13 @@ class TMDbAPIs:
             end_date=util.validate_date(end_date)
         )["results"]]
 
-    def collection(self, collection_id: int, load: bool = True) -> Collection:
+    def collection(self, collection_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Collection:
         """ Gets the :class:`~tmdbapis.objs.reload.Collection` for the given id.
 
             Parameters:
                 collection_id (int): Collection ID of the collection you want.
                 load (bool): Load the data on creation.
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
 
             Returns:
                 :class:`~tmdbapis.objs.reload.Collection`
@@ -561,14 +562,15 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no collection is found for the given id.
         """
-        return Collection(self, {"id": collection_id}, load=load)
+        return Collection(self, {"id": collection_id}, load=load, partial=partial)
 
-    def company(self, company_id: int, load: bool = True) -> Company:
+    def company(self, company_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Company:
         """ Gets the :class:`~tmdbapis.objs.reload.Company` for the given id.
 
             Parameters:
                 company_id (int): Company ID of the company you want.
                 load (bool): Load the data on creation.
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
 
             Returns:
                 :class:`~tmdbapis.objs.reload.Company`
@@ -576,7 +578,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no company is found for the given id.
         """
-        return Company(self, {"id": company_id}, load=load)
+        return Company(self, {"id": company_id}, load=load, partial=partial)
 
     def configuration(self, reload: bool = False) -> Configuration:
         """ Gets the TMDb :class:`~tmdbapis.objs.reload.Configuration`.
@@ -847,12 +849,13 @@ class TMDbAPIs:
             )["list_id"]
         return self.list(list_id) if load else int(list_id)
 
-    def movie(self, movie_id: int, load: bool = True) -> Movie:
+    def movie(self, movie_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Movie:
         """ Gets the :class:`~tmdbapis.objs.reload.Movie` for the given id.
 
             Parameters:
                 movie_id (str): Movie ID of the movie you want.
                 load (bool): Load the data on creation.
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
 
             Returns:
                 :class:`~tmdbapis.objs.reload.Movie`
@@ -860,7 +863,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no keyword is found for the given id.
         """
-        return Movie(self, {"id": movie_id}, load=load)
+        return Movie(self, {"id": movie_id}, load=load, partial=partial)
 
     def latest_movie(self) -> Movie:
         """ Gets the latest :class:`~tmdbapis.objs.reload.Movie` added on TMDb.
@@ -926,12 +929,13 @@ class TMDbAPIs:
         """
         return UpcomingMovies(self, region=util.validate_country(region, self._iso_3166_1))
 
-    def network(self, network_id: int, load: bool = True) -> Network:
+    def network(self, network_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Network:
         """ Gets the :class:`~tmdbapis.objs.reload.Network` for the given id.
 
             Parameters:
                 network_id (int): Network ID of the network you want.
                 load (bool): Load the data on creation.
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
 
             Returns:
                 :class:`~tmdbapis.objs.reload.Network`
@@ -939,7 +943,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no network is found for the given id.
         """
-        return Network(self, {"id": network_id}, load=load)
+        return Network(self, {"id": network_id}, load=load, partial=partial)
 
     def trending(self, media_type: str, time_window: str) -> Trending:
         """ Gets the :class:`~tmdbapis.objs.pagination.Trending` for the given id.
@@ -960,12 +964,13 @@ class TMDbAPIs:
             raise Invalid(f"time_window: {time_window} Invalid. Options: day or week")
         return Trending(self, media_type, time_window)
 
-    def person(self, person_id: int, load: bool = True) -> Person:
+    def person(self, person_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Person:
         """ Gets the :class:`~tmdbapis.objs.reload.Person` for the given id.
 
             Parameters:
                 person_id (int): Person ID of the person you want.
                 load (bool): Load the data on creation.
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
 
             Returns:
                 :class:`~tmdbapis.objs.reload.Person`
@@ -973,7 +978,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no person is found for the given id.
         """
-        return Person(self, {"id": person_id}, load=load)
+        return Person(self, {"id": person_id}, load=load, partial=partial)
 
     def latest_person(self) -> Person:
         """ Gets the latest :class:`~tmdbapis.objs.reload.Person` added on TMDb.
@@ -1124,12 +1129,13 @@ class TMDbAPIs:
         return SearchTVShows(self, requests.utils.quote(query), include_adult=include_adult,
                              first_air_date_year=first_air_date_year)
 
-    def tv_show(self, tv_id: int, load: bool = True) -> TVShow:
+    def tv_show(self, tv_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> TVShow:
         """ Gets the :class:`~tmdbapis.objs.reload.TVShow` for the given id.
 
             Parameters:
                 tv_id (int): TV ID of the show you want.
                 load (bool): Load the data on creation.
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
 
             Returns:
                 :class:`~tmdbapis.objs.reload.TVShow`
@@ -1137,7 +1143,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no keyword is found for the given id.
         """
-        return TVShow(self, {"id": tv_id}, load=load)
+        return TVShow(self, {"id": tv_id}, load=load, partial=partial)
 
     def latest_tv(self) -> TVShow:
         """ Gets the latest :class:`~tmdbapis.objs.reload.TVShow` added on TMDb.
@@ -1179,13 +1185,14 @@ class TMDbAPIs:
         """
         return TopRatedTVShows(self)
 
-    def tv_season(self, tv_id: int, season_number: int, load: bool = True) -> Season:
+    def tv_season(self, tv_id: int, season_number: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Season:
         """ Gets the :class:`~tmdbapis.objs.reload.Movie` for the given id.
 
             Parameters:
                 tv_id (int): TV ID of the show the contains the season you want.
                 season_number (int): Season number to grab.
                 load (bool): Load the data on creation.
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
 
             Returns:
                 :class:`~tmdbapis.objs.reload.Season`
@@ -1193,9 +1200,9 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no season is found for the given id.
         """
-        return Season(self, {"season_number": season_number}, tv_id, load=load)
+        return Season(self, {"season_number": season_number}, tv_id, load=load, partial=partial)
 
-    def tv_episode(self, tv_id: int, season_number: int, episode_number: int, load: bool = True) -> Episode:
+    def tv_episode(self, tv_id: int, season_number: int, episode_number: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Episode:
         """ Gets the :class:`~tmdbapis.objs.reload.Episode` for the given id.
 
             Parameters:
@@ -1203,6 +1210,7 @@ class TMDbAPIs:
                 season_number (int): Season number to grab.
                 episode_number (int): Episode number to grab.
                 load (bool): Load the data on creation.
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
 
             Returns:
                 :class:`~tmdbapis.objs.reload.Episode`
@@ -1210,7 +1218,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no keyword is found for the given id.
         """
-        return Episode(self, {"season_number": season_number, "episode_number": episode_number}, tv_id, load=load)
+        return Episode(self, {"season_number": season_number, "episode_number": episode_number}, tv_id, load=load, partial=partial)
 
     def episode_group(self, episode_group_id: str, load: bool = True) -> EpisodeGroup:
         """ Gets the :class:`~tmdbapis.objs.reload.EpisodeGroup` for the given id.

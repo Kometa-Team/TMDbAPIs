@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Optional
+from typing import Optional, Union
 
 from tmdbapis.objs.base import TMDbObj
 from tmdbapis.objs.mixin import Favorite, Rate, Watchlist
@@ -7,23 +7,33 @@ from tmdbapis.objs.mixin import Favorite, Rate, Watchlist
 
 class TMDbReload(TMDbObj):
     """ Base object for objects that Reload. """
-    def __init__(self, tmdb, data, load=False):
+    def __init__(self, tmdb, data, load=False, partial=False):
         super().__init__(tmdb, data)
         if load:
-            self._load(None)
+            self.reload(partial=partial)
 
     @abstractmethod
-    def _load(self, data):
-        self._partial = data is not None
-        super()._load(self._full_load() if data is None else data)
+    def _load(self, data, partial=False):
+        self._partial = data is not None or partial is not False
+        super()._load(self._append_load(partial=partial) if data is None else data)
+
+    def _append_str(self):
+        return None
+
+    def _append_load(self, partial=False):
+        return self._full_load(partial=self._append_str() if partial is False else partial)
 
     @abstractmethod
-    def _full_load(self):
+    def _full_load(self, partial=None):
         pass
 
-    def reload(self):
-        """ Reloads the full object. """
-        self._load(None)
+    def reload(self, partial: Optional[Union[bool, str]] = False):
+        """ Reloads the object.
+
+            Parameters:
+                partial (Optional[Union[bool, str]]): leave False for a full load otherwise specify the endpoints you want added.
+        """
+        self._load(None, partial=partial)
 
 
 class Account(TMDbReload):
@@ -46,8 +56,8 @@ class Account(TMDbReload):
     def __init__(self, tmdb):
         super().__init__(tmdb, None)
 
-    def _load(self, data):
-        super()._load(None)
+    def _load(self, data, partial=False):
+        super()._load(None, partial=partial)
         self.avatar_hash = self._parse(attrs=["avatar", "gravatar", "hash"])
         self.avatar_path = self._parse(attrs=["avatar", "tmdb", "avatar_path"])
         self.avatar_url = self._image_url(self.avatar_path)
@@ -61,7 +71,7 @@ class Account(TMDbReload):
         self.username = self._parse(attrs="username")
         self._finish(self.name)
 
-    def _full_load(self):
+    def _full_load(self, partial=None):
         return self._api.account_get_details()
 
     def created_lists(self, v3: bool = False):
@@ -122,8 +132,8 @@ class Collection(TMDbReload):
             translations (List[:class:`~tmdbapis.objs.simple.Translation`]): List of Translations for the Collection.
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.backdrop_path = self._parse(attrs="backdrop_path")
         self.backdrop_url = self._image_url(self.backdrop_path)
         self.backdrops = self._parse(attrs=["images", "backdrops"], value_type="backdrop", is_list=True)
@@ -137,11 +147,14 @@ class Collection(TMDbReload):
         self.translations = self._parse(attrs=["translations", "translations"], value_type="translation", is_list=True)
         self._finish(self.name)
 
-    def _full_load(self):
+    def _append_str(self):
+        return "images,translations"
+
+    def _full_load(self, partial=None):
         return self._api.collections_get_details(
             self.id,
             language=self._tmdb.language,
-            append_to_response="images,translations",
+            append_to_response=partial,
             include_image_language=self._tmdb._include_language
         )
 
@@ -165,8 +178,8 @@ class Company(TMDbReload):
             tv_shows (:class:`~tmdbapis.objs.pagination.DiscoverTVShows`): Pagination Object of Company TV Shows.
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self._movies = None
         self._tv_shows = None
         self.alternative_names = self._parse(attrs=["alternative_names", "results"],
@@ -183,12 +196,11 @@ class Company(TMDbReload):
         self.parent_company = self._parse(attrs="parent_company", value_type="company")
         self._finish(self.name)
 
-    def _full_load(self):
-        return self._api.companies_get_details(
-            self.id,
-            language=self._tmdb.language,
-            append_to_response="alternative_names,images"
-        )
+    def _append_str(self):
+        return "alternative_names,images"
+
+    def _full_load(self, partial=None):
+        return self._api.companies_get_details(self.id, language=self._tmdb.language, append_to_response=partial)
 
     @property
     def movies(self):
@@ -222,11 +234,11 @@ class Configuration(TMDbReload):
             timezones (List[str]): Timezones in TMDb.
     """
 
-    def __init__(self, tmdb):
-        super().__init__(tmdb, None)
+    def __init__(self, tmdb, partial=False):
+        super().__init__(tmdb, None, partial=partial)
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.backdrop_sizes = self._parse(attrs=["images", "backdrop_sizes"], is_list=True)
         self.base_image_url = self._parse(attrs=["images", "base_url"])
         self.change_keys = self._parse(attrs="change_keys", is_list=True)
@@ -242,10 +254,11 @@ class Configuration(TMDbReload):
         self.timezones = self._parse(attrs="timezones", value_type="load_timezone", is_list=True)
         self._finish("API3 Configuration")
 
-    def _full_load(self):
-        return self._api.configuration_get_api_configuration(
-            append_to_response="countries,jobs,languages,primary_translations,timezones"
-        )
+    def _append_str(self):
+        return "countries,jobs,languages,primary_translations,timezones"
+
+    def _full_load(self, partial=None):
+        return self._api.configuration_get_api_configuration(append_to_response=partial)
 
 
 class Credit(TMDbReload):
@@ -281,8 +294,8 @@ class Credit(TMDbReload):
         self._media_type = media_type
         super().__init__(tmdb, data=data, load=load)
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
 
         def dict_check(dict_attr, attr):
             return [dict_attr, attr] if dict_attr in self._data else attr
@@ -323,7 +336,7 @@ class Credit(TMDbReload):
             elif self.media_type == "tv":
                 self.tv_show = self._tmdb.tv_show(self._parse(attrs="id", value_type="int"), load=False)
 
-    def _full_load(self):
+    def _full_load(self, partial=None):
         return self._api.credits_get_details(self.id)
 
 
@@ -359,12 +372,12 @@ class Episode(TMDbReload, Rate):
             vote_count (int): Number of Votes for the Episode.
     """
 
-    def __init__(self, tmdb, data, tv_id=None, load=False):
+    def __init__(self, tmdb, data, tv_id=None, load=False, partial=False):
         self._tv_id = tv_id
-        super().__init__(tmdb, data=data, load=load)
+        super().__init__(tmdb, data=data, load=load, partial=partial)
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.air_date = self._parse(attrs="air_date", value_type="date")
         self.cast = self._parse(attrs=["credits", "cast"], value_type="tv_cast", is_list=True)
         self.crew = self._parse(attrs="crew", value_type="tv_crew", is_list=True)
@@ -396,13 +409,16 @@ class Episode(TMDbReload, Rate):
         self.vote_count = self._parse(attrs="vote_count", value_type="int")
         self._finish(self.name)
 
-    def _full_load(self):
+    def _append_str(self):
+        return "account_states,credits,external_ids,images,translations,videos"
+
+    def _full_load(self, partial=None):
         return self._api.tv_episodes_get_details(
             self.tv_id, self.season_number, self.episode_number,
             language=self._tmdb.language,
             include_image_language=self._tmdb._include_language,
             include_video_language=self._tmdb._include_language,
-            append_to_response="account_states,credits,external_ids,images,translations,videos"
+            append_to_response=partial
         )
 
     def _rate(self, rating):
@@ -426,8 +442,8 @@ class EpisodeGroup(TMDbReload):
             type (int): Episode Group Type.
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.description = self._parse(attrs="description")
         self.episode_count = self._parse(attrs="episode_count", value_type="int")
         self.group_count = self._parse(attrs="group_count", value_type="int")
@@ -438,7 +454,7 @@ class EpisodeGroup(TMDbReload):
         self.type = self._parse(attrs="type", value_type="int")
         self._finish(self.name)
 
-    def _full_load(self):
+    def _full_load(self, partial=None):
         return self._api.tv_episode_groups_get_details(self.id, language=self._tmdb.language)
 
 
@@ -452,15 +468,15 @@ class Keyword(TMDbReload):
             tv_shows (:class:`~tmdbapis.objs.pagination.DiscoverTVShows`): Keyword TV Shows.
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self._movies = None
         self._tv_shows = None
         self.id = self._parse(attrs="id", value_type="int")
         self.name = self._parse(attrs="name")
         self._finish(self.name)
 
-    def _full_load(self):
+    def _full_load(self, partial=None):
         return self._api.keywords_get_details(self.id, language=self._tmdb.language)
 
     @property
@@ -532,8 +548,8 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
             watchlist (bool): If this Movie has been added to your watchlist. (Authentication Required)
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.adult = self._parse(attrs="adult", value_type="bool")
         self.alternative_titles = self._parse(attrs=["alternative_titles", "titles"], value_type="alternative_title",
                                               is_list=True)
@@ -596,15 +612,17 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
         self.watchlist = self._parse(attrs=["account_states", "watchlist"], value_type="bool")
         self._finish(self.title)
 
-    def _full_load(self):
+    def _append_str(self):
+        return "account_states,alternative_titles,credits,external_ids,images,keywords,lists,recommendations," \
+               "release_dates,reviews,similar,trailers,translations,videos,watch/providers"
+
+    def _full_load(self, partial=None):
         return self._api.movies_get_details(
             self.id,
             language=self._tmdb.language,
             include_image_language=self._tmdb._include_language,
             include_video_language=self._tmdb._include_language,
-            append_to_response="account_states,alternative_titles,credits,external_ids,images,"
-                               "keywords,lists,recommendations,release_dates,reviews,similar,"
-                               "trailers,translations,videos,watch/providers"
+            append_to_response=partial
         )
 
     def _rate(self, rating):
@@ -633,8 +651,8 @@ class Network(TMDbReload):
             tv_shows (:class:`~tmdbapis.objs.pagination.DiscoverTVShows`): Network TV Shows.
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self._tv_shows = None
         self.alternative_names = self._parse(attrs=["alternative_names", "results"],
                                              value_type="alternative_name", is_list=True)
@@ -648,8 +666,11 @@ class Network(TMDbReload):
         self.name = self._parse(attrs="name")
         self._finish(self.name)
 
-    def _full_load(self):
-        return self._api.networks_get_details(self.id, append_to_response="alternative_names,images")
+    def _append_str(self):
+        return "alternative_names,images"
+
+    def _full_load(self, partial=None):
+        return self._api.networks_get_details(self.id, append_to_response=partial)
 
     @property
     def tv_shows(self):
@@ -692,8 +713,8 @@ class Person(TMDbReload):
             twitter_id (str): Twitter ID for the Person.
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.adult = self._parse(attrs="adult", value_type="bool")
         self.also_known_as = self._parse(attrs="also_known_as", is_list=True)
         self.biography = self._parse(attrs="biography")
@@ -724,12 +745,11 @@ class Person(TMDbReload):
         self.twitter_id = self._parse(attrs=["external_ids", "twitter_id"])
         self._finish(self.name)
 
-    def _full_load(self):
-        return self._api.people_get_details(
-            self.id,
-            language=self._tmdb.language,
-            append_to_response="movie_credits,tv_credits,external_ids,images,tagged_images,translations"
-        )
+    def _append_str(self):
+        return "movie_credits,tv_credits,external_ids,images,tagged_images,translations"
+
+    def _full_load(self, partial=None):
+        return self._api.people_get_details(self.id, language=self._tmdb.language, append_to_response=partial)
 
 
 class Review(TMDbReload):
@@ -753,8 +773,8 @@ class Review(TMDbReload):
             username (str): Review Author Username.
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.author = self._parse(attrs="author")
         self.avatar_path = self._parse(attrs=["author_details", "avatar_path"])
         self.avatar_url = self._image_url(self.avatar_path)
@@ -772,7 +792,7 @@ class Review(TMDbReload):
         self.username = self._parse(attrs=["author_details", "username"])
         self._finish(self.author)
 
-    def _full_load(self):
+    def _full_load(self, partial=None):
         return self._api.reviews_get_details(self.id)
 
 
@@ -803,12 +823,12 @@ class Season(TMDbReload):
             videos (List[:class:`~tmdbapis.objs.simple.Video`]): List of Videos associated with the Season.
     """
 
-    def __init__(self, tmdb, data, tv_id, load=False):
+    def __init__(self, tmdb, data, tv_id, load=False, partial=False):
         self._tv_id = tv_id
-        super().__init__(tmdb, data=data, load=load)
+        super().__init__(tmdb, data=data, load=load, partial=partial)
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.aggregate_cast = self._parse(attrs=["aggregate_credits", "cast"], value_type="agg_tv_cast", extend=True)
         self.aggregate_crew = self._parse(attrs=["aggregate_credits", "crew"], value_type="agg_tv_crew", extend=True)
         self.air_date = self._parse(attrs="air_date", value_type="date")
@@ -832,13 +852,16 @@ class Season(TMDbReload):
         self.videos = self._parse(attrs=["videos", "results"], value_type="video", is_list=True)
         self._finish(self.name)
 
-    def _full_load(self):
+    def _append_str(self):
+        return "images,translations"
+
+    def _full_load(self, partial=None):
         return self._api.tv_seasons_get_details(
             self.tv_id, self.season_number,
             language=self._tmdb.language,
             include_image_language=self._tmdb._include_language,
             include_video_language=self._tmdb._include_language,
-            append_to_response="account_states,aggregate_credits,credits,external_ids,images,translations,videos"
+            append_to_response=partial
         )
 
 
@@ -909,8 +932,8 @@ class TVShow(TMDbReload, Favorite, Rate, Watchlist):
             watchlist (bool): If this TV Show has been added to your watchlist. (Authentication Required)
     """
 
-    def _load(self, data):
-        super()._load(data)
+    def _load(self, data, partial=False):
+        super()._load(data, partial=partial)
         self.aggregate_cast = self._parse(attrs=["aggregate_credits", "cast"], value_type="agg_tv_cast", extend=True)
         self.aggregate_crew = self._parse(attrs=["aggregate_credits", "crew"], value_type="agg_tv_crew", extend=True)
         self.alternative_titles = self._parse(attrs=["alternative_titles", "results"],
@@ -979,15 +1002,17 @@ class TVShow(TMDbReload, Favorite, Rate, Watchlist):
         self.watchlist = self._parse(attrs=["account_states", "watchlist"], value_type="bool")
         self._finish(self.name)
 
-    def _full_load(self):
+    def _append_str(self):
+        return "account_states,aggregate_credits,alternative_titles,content_ratings,credits,episode_groups," \
+               "external_ids,images,keywords,recommendations,similar,translations,videos,watch/providers"
+
+    def _full_load(self, partial=None):
         return self._api.tv_get_details(
             self.id,
             language=self._tmdb.language,
             include_image_language=self._tmdb._include_language,
             include_video_language=self._tmdb._include_language,
-            append_to_response="account_states,aggregate_credits,alternative_titles,content_ratings,"
-                               "credits,episode_groups,external_ids,images,keywords,recommendations,"
-                               "similar,translations,videos,watch/providers"
+            append_to_response=partial
         )
 
     def _rate(self, rating):
