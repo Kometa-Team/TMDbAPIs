@@ -84,6 +84,9 @@ class TMDbPagination(TMDbObj):
     def __iter__(self):
         return (o for o in self.results)
 
+    def __getitem__(self, index):
+        return self.results[index]
+
     def __len__(self):
         return self.total_results
 
