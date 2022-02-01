@@ -25,6 +25,9 @@ class TMDbPagination(TMDbObj):
         self._single_load = False
         self._page_storage = {}
         self._params = parse_qs(urlparse(tmdb._api.response.url).query)
+        self._loading = True
+        self.page = None
+        self._loading = False
         super().__init__(tmdb=tmdb, data=data)
 
     def _load(self, data):

@@ -1,8 +1,6 @@
 import logging
 from datetime import datetime
 from typing import Optional, Union, List, Dict
-
-import requests
 from requests import Session
 
 from tmdbapis import util
@@ -1037,7 +1035,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchCollections(self, requests.utils.quote(query))
+        return SearchCollections(self, query)
 
     def keyword_search(self, query: str) -> SearchKeywords:
         """ Searches TMDb for keywords.
@@ -1051,7 +1049,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchKeywords(self, requests.utils.quote(query))
+        return SearchKeywords(self, query)
 
     def movie_search(self, query: str, include_adult: Optional[bool] = None,
                      region: Optional[Union[Country, str]] = None, year: Optional[int] = None,
@@ -1071,7 +1069,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchMovies(self, requests.utils.quote(query), include_adult=include_adult,
+        return SearchMovies(self, query, include_adult=include_adult,
                             region=util.validate_country(region, self._iso_3166_1),
                             year=year, primary_release_year=primary_release_year)
 
@@ -1090,7 +1088,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchMulti(self, requests.utils.quote(query), include_adult=include_adult,
+        return SearchMulti(self, query, include_adult=include_adult,
                            region=util.validate_country(region, self._iso_3166_1))
 
     def people_search(self, query: str, include_adult: Optional[bool] = None,
@@ -1108,7 +1106,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchPeople(self, requests.utils.quote(query), include_adult=include_adult,
+        return SearchPeople(self, query, include_adult=include_adult,
                             region=util.validate_country(region, self._iso_3166_1))
 
     def tv_search(self, query: str, include_adult: Optional[bool] = None,
@@ -1126,7 +1124,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchTVShows(self, requests.utils.quote(query), include_adult=include_adult,
+        return SearchTVShows(self, query, include_adult=include_adult,
                              first_air_date_year=first_air_date_year)
 
     def tv_show(self, tv_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> TVShow:
