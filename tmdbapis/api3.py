@@ -1,10 +1,8 @@
 import logging
 from json.decoder import JSONDecodeError
 from typing import Dict, Optional, Union
-
 from requests import Session, Response
 from requests.exceptions import RequestException
-
 from tmdbapis.api4 import API4
 from tmdbapis.exceptions import TMDbException, NotFound, Unauthorized, WritePermission, PrivateResource, Authentication
 
@@ -821,6 +819,8 @@ class API3:
                 with_runtime.gte (Optional[int]): Filter and only include movies that have a runtime that is greater or equal to a value.
                 with_runtime.lte (Optional[int]): Filter and only include movies that have a runtime that is less than or equal to a value.
                 with_original_language (Optional[str]): Specify an ISO 639-1 string to filter results by their original language value.
+                with_title_translation (Optional[str]): Specify a Primary Translation string to filter results by their title translation value.
+                with_overview_translation (Optional[str]): Specify a Primary Translation string to filter results by their overview translation value.
                 with_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
                 watch_region (Optional[str]): An ISO 3166-1 code. Combine this filter with ``with_watch_providers`` in order to filter your results by a specific watch provider in a specific region.
                 with_watch_monetization_types (Optional[str]): In combination with ``watch_region``, you can filter by monetization type. Allowed Values: ``flatrate``, ``free``, ``ads``, ``rent``, ``buy``
@@ -869,6 +869,8 @@ class API3:
                 screened_theatrically (Optional[bool]): Filter results to include items that have been screened theatrically.
                 with_companies (Optional[str]): A comma separated list of production company ID's. Only include movies that have one of the ID's added as a production company.
                 with_keywords (Optional[str]): A comma separated list of keyword ID's. Only includes TV shows that have one of the ID's added as a keyword.
+                with_name_translation (Optional[str]): Specify a Primary Translation string to filter results by their name translation value.
+                with_overview_translation (Optional[str]): Specify a Primary Translation string to filter results by their overview translation value.
                 with_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
                 watch_region (Optional[str]): An ISO 3166-1 code. Combine this filter with ``with_watch_providers`` in order to filter your results by a specific watch provider in a specific region.
                 with_watch_monetization_types (Optional[str]): In combination with ``watch_region``, you can filter by monetization type. Allowed Values: ``flatrate``, ``free``, ``ads``, ``rent``, ``buy``

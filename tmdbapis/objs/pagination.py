@@ -4,9 +4,12 @@ from urllib.parse import urlparse, parse_qs
 
 from tmdbapis.objs.base import TMDbObj
 from tmdbapis.objs.reload import Movie, TVShow
-from tmdbapis import util
 from tmdbapis.exceptions import NotFound, Invalid
 
+v3_sorts = ["created_at.asc", "created_at.desc"]
+v4_movie_sorts = ["created_at.asc", "created_at.desc", "release_date.asc", "release_date.desc", "title.asc", "title.desc", "vote_average.asc", "vote_average.desc"]
+v4_show_sorts = ["created_at.asc", "created_at.desc", "first_air_date.asc", "first_air_date.desc", "name.asc", "name.desc", "vote_average.asc", "vote_average.desc"]
+v4_list_sorts = ["original_order.asc", "original_order.desc", "vote_average.asc", "vote_average.desc", "primary_release_date.asc", "primary_release_date.desc", "title.asc", "title.desc"]
 
 class TMDbPagination(TMDbObj):
     """ Represents a Pagination Object. The standard iterator only loops through the current page.
@@ -118,6 +121,18 @@ class TMDbPagination(TMDbObj):
                 results.extend(self.results[:amount-len(results)])
         return results
 
+    def _sort(self, sort_by, v3, is_movie):
+        if not sort_by:
+            return None
+        elif v3 and sort_by not in v3_sorts:
+            raise Invalid(f"sort_by not in {v3_sorts}")
+        elif not v3 and is_movie and sort_by not in v4_movie_sorts:
+            raise Invalid(f"sort_by not in {v4_movie_sorts}")
+        elif not v3 and not is_movie and sort_by not in v4_show_sorts:
+            raise Invalid(f"sort_by not in {v4_show_sorts}")
+        else:
+            return sort_by
+
 
 class CreatedLists(TMDbPagination):
     """ Paginated Object of the lists created by an account. Will include private lists if you are the owner. """
@@ -165,7 +180,7 @@ class FavoriteMovies(TMDbPagination):
     def __init__(self, tmdb, sort_by=None, v3=False):
         self._v3 = v3 or tmdb._api4 is None
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, self._v3, True)
+        self.sort_by = self._sort(sort_by, self._v3, True)
         self._loading = False
         super().__init__(tmdb, None, "movie", "FavoriteMovies")
 
@@ -185,7 +200,7 @@ class FavoriteTVShows(TMDbPagination):
     def __init__(self, tmdb, sort_by=None, v3=False):
         self._v3 = v3 or tmdb._api4 is None
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, self._v3, False)
+        self.sort_by = self._sort(sort_by, self._v3, False)
         self._loading = False
         super().__init__(tmdb, None, "tv", "FavoriteTVShows")
 
@@ -204,7 +219,7 @@ class RatedEpisodes(TMDbPagination):
     """
     def __init__(self, tmdb, sort_by=None):
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, True, False)
+        self.sort_by = self._sort(sort_by, True, False)
         self._loading = False
         super().__init__(tmdb, None, "episode", "RatedEpisodes")
 
@@ -221,7 +236,7 @@ class RatedMovies(TMDbPagination):
     def __init__(self, tmdb, sort_by=None, v3=False):
         self._v3 = v3 or tmdb._api4 is None
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, self._v3, True)
+        self.sort_by = self._sort(sort_by, self._v3, True)
         self._loading = False
         super().__init__(tmdb, None, "movie", "RatedMovies")
 
@@ -241,7 +256,7 @@ class RatedTVShows(TMDbPagination):
     def __init__(self, tmdb, sort_by=None, v3=False):
         self._v3 = v3 or tmdb._api4 is None
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, self._v3, False)
+        self.sort_by = self._sort(sort_by, self._v3, False)
         self._loading = False
         super().__init__(tmdb, None, "tv", "RatedTVShows")
 
@@ -276,7 +291,7 @@ class MovieRecommendations(TMDbPagination):
     """
     def __init__(self, tmdb, sort_by=None):
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, False, True)
+        self.sort_by = self._sort(sort_by, False, True)
         self._loading = False
         super().__init__(tmdb, None, "movie", "MovieRecommendations")
 
@@ -309,7 +324,7 @@ class MovieWatchlist(TMDbPagination):
     def __init__(self, tmdb, sort_by=None, v3=False):
         self._v3 = v3 or tmdb._api4 is None
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, self._v3, True)
+        self.sort_by = self._sort(sort_by, self._v3, True)
         self._loading = False
         super().__init__(tmdb, None, "movie", "MovieWatchlist")
 
@@ -739,8 +754,8 @@ class TMDbList(TMDbPagination):
         """
         if name is None and description is None and public is None and sort_by is None:
             raise Invalid("Must have at least one parameter to update (name, description, public, or sort_by)")
-        if sort_by and sort_by not in util.v4_list_sorts:
-            raise Invalid(f"sort_by not in {util.v4_list_sorts}")
+        if sort_by and sort_by not in v4_list_sorts:
+            raise Invalid(f"sort_by not in {v4_list_sorts}")
         self._tmdb._v4_check().list_update_list(
             self.id,
             name=name,
@@ -920,7 +935,7 @@ class TVShowRecommendations(TMDbPagination):
     """
     def __init__(self, tmdb, sort_by=None):
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, False, False)
+        self.sort_by = self._sort(sort_by, False, False)
         self._loading = False
         super().__init__(tmdb, None, "tv", "TVShowRecommendations")
 
@@ -955,7 +970,7 @@ class TVShowWatchlist(TMDbPagination):
     def __init__(self, tmdb, sort_by=None, v3=False):
         self._v3 = v3 or tmdb._api4 is None
         self._loading = True
-        self.sort_by = util.validate_sort(sort_by, self._v3, False)
+        self.sort_by = self._sort(sort_by, self._v3, False)
         self._loading = False
         super().__init__(tmdb, None, "tv", "TVShowWatchlist")
 

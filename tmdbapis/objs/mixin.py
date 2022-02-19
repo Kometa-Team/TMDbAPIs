@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-
 from tmdbapis.exceptions import Invalid
 from tmdbapis.objs.base import TMDbObj
 

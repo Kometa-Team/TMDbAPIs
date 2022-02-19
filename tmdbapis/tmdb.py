@@ -2,8 +2,6 @@ import logging
 from datetime import datetime
 from typing import Optional, Union, List, Dict
 from requests import Session
-
-from tmdbapis import util
 from tmdbapis.api3 import API3
 from tmdbapis.api4 import API4
 from tmdbapis.exceptions import Authentication, Invalid
@@ -11,13 +9,36 @@ from tmdbapis.objs.pagination import NowPlayingMovies, PopularMovies, TopRatedMo
     TVShowsAiringToday, TVShowsOnTheAir, PopularTVShows, TopRatedTVShows, MovieRecommendations, TVShowRecommendations, \
     SearchCompanies, SearchCollections, SearchKeywords, SearchMovies, SearchMulti, SearchPeople, SearchTVShows, \
     CreatedLists, FavoriteMovies, FavoriteTVShows, RatedMovies, RatedTVShows, RatedEpisodes, MovieWatchlist, \
-    TVShowWatchlist, DiscoverMovies, DiscoverTVShows
-from tmdbapis.objs.pagination import TMDbList
+    TVShowWatchlist, DiscoverMovies, DiscoverTVShows, TMDbList
 from tmdbapis.objs.reload import Account, Collection, Configuration, Company, Credit, Keyword, Movie, \
     Network, Person, Review, TVShow, Season, Episode, EpisodeGroup
 from tmdbapis.objs.simple import Country, CountryCertifications, Genre, WatchProvider, FindResults, Language
 
 logger = logging.getLogger(__name__)
+
+discover_movie_options = [
+    "region", "sort_by", "certification_country", "certification", "certification.lte", "certification.gte",
+    "include_adult", "include_video", "primary_release_year", "with_release_type", "year", "primary_release_date.gte",
+    "primary_release_date.lte", "release_date.gte", "release_date.lte", "vote_count.gte", "vote_count.lte",
+    "vote_average.gte", "vote_average.lte", "with_cast", "with_crew", "with_people", "with_companies", "with_genres",
+    "without_genres", "with_title_translation", "with_keywords", "without_keywords", "with_runtime.gte",
+    "with_runtime.lte", "with_original_language", "with_watch_providers", "watch_region",
+    "with_watch_monetization_types", "with_title_translation", "with_overview_translation"
+]
+discover_movie_sort_options = [
+    "popularity.asc", "popularity.desc", "release_date.asc", "release_date.desc", "revenue.asc", "revenue.desc",
+    "primary_release_date.asc", "primary_release_date.desc", "original_title.asc", "original_title.desc",
+    "vote_average.asc", "vote_average.desc", "vote_count.asc", "vote_count.desc"
+]
+discover_tv_options = [
+    "sort_by", "air_date.gte", "air_date.lte", "first_air_date.gte", "first_air_date.lte", "first_air_date_year",
+    "timezone", "vote_average.gte", "vote_average.lte", "vote_count.gte", "vote_count.lte", "with_genres",
+    "with_networks", "without_genres", "with_runtime.gte", "with_runtime.lte", "include_null_first_air_dates",
+    "with_original_language", "without_keywords", "screened_theatrically", "with_companies", "with_keywords",
+    "with_watch_providers", "watch_region", "with_watch_monetization_types", "with_name_translation",
+    "with_overview_translation"
+]
+discover_tv_sort_options = ["popularity.asc", "popularity.desc", "first_air_date.desc", "first_air_date.asc", "vote_average.asc", "vote_average.desc"]
 
 
 class TMDbAPIs:
@@ -54,9 +75,10 @@ class TMDbAPIs:
         self._tv_providers = None
         self._config = None
         self._config = self.configuration()
-        self._iso_3166_1 = {v.iso_3166_1: v for v in self._config.countries}
-        self._iso_639_1 = {v.iso_639_1: v for v in self._config.languages}
-        self._languages = self._config.primary_translations + [v.iso_639_1 for k, v in self._iso_639_1.items()]
+        self._iso_3166_1 = {v.iso_3166_1.lower(): v for v in self._config.countries}
+        self._iso_639_1 = {v.iso_639_1.lower(): v for v in self._config.languages}
+        self._translations = {v.lower(): v for v in self._config.primary_translations}
+        self._languages = [v for k, v in self._translations.items()] + [v.iso_639_1 for k, v in self._iso_639_1.items()]
         self._image_url = f"{self._config.secure_base_image_url}original"
         self.language = language
         self._include_language = f"{self.language[:2]},null" if len(self.language) > 2 else "null"
@@ -77,8 +99,7 @@ class TMDbAPIs:
         def object_check(lookup_obj, key, lookup_dict, is_int=False):
             if isinstance(lookup_obj, dict):
                 lookup_obj = lookup_obj[key] if key in lookup_obj else None
-            if is_int:
-                lookup_obj = int(lookup_obj)
+            lookup_obj = int(lookup_obj) if is_int else str(lookup_obj).lower()
             return lookup_dict[lookup_obj] if lookup_obj in lookup_dict else None
         if obj_type == "country":
             return object_check(lookup, "iso_3166_1", self._iso_3166_1)
@@ -91,16 +112,109 @@ class TMDbAPIs:
         else:
             return None
 
+    def _validate_language(self, language):
+        if isinstance(language, Language):
+            return language.iso_639_1
+        elif str(language).lower() in self._iso_639_1:
+            return str(language).lower()
+        else:
+            raise Invalid(f"Language: {language} is invalid see Configuration.languages for the options.")
+
+    def _validate_country(self, country):
+        if not country:
+            return None
+        elif isinstance(country, Country):
+            return country.iso_3166_1
+        elif str(country).lower() in self._iso_3166_1:
+            return str(country).lower()
+        else:
+            raise Invalid(f"Country: {country} is invalid see Configuration.countries for the options.")
+
+    def _validate_translation(self, translation):
+        if str(translation).lower() in self._translations:
+            return self._translations[str(translation).lower()]
+        else:
+            raise Invalid(f"Translation: {translation} is invalid see Configuration.primary_translations for the options.")
+
+    def _validate_date(self, data, date_format="%Y-%m-%d"):
+        if not data:
+            return None
+        elif isinstance(data, datetime):
+            return data.strftime(date_format)
+        else:
+            try:
+                return datetime.strptime(str(data), date_format).strftime(date_format)
+            except ValueError:
+                raise Invalid(f"date: {data} must be a datetime or in the format YYYY-MM-DD")
+
+    def _validate_discover(self, is_movie, **kwargs):
+        validated = {}
+        for k, v in kwargs.items():
+            if is_movie and k not in discover_movie_options or not is_movie and k not in discover_tv_options:
+                raise Invalid(f"{k} is not a valid parameter")
+            elif k == "sort_by":
+                if is_movie and v not in discover_movie_sort_options or not is_movie and v not in discover_tv_sort_options:
+                    raise Invalid(f"{v} is not a valid sort_by option")
+                validated[k] = v
+            elif k in ["region", "watch_region"]:
+                validated[k] = self._validate_country(v).upper()
+            elif k == "with_original_language":
+                validated[k] = self._validate_language(v)
+            elif k in ["with_title_translation", "with_name_translation", "with_overview_translation"]:
+                validated[k] = self._validate_translation(v)
+            elif k == "certification_country":
+                if "certification" not in kwargs and "certification.lte" not in kwargs and "certification.gte" not in kwargs:
+                    raise Invalid("certification_country must be used with either certification, certification.lte, or certification.gte")
+                validated[k] = str(v)
+            elif k in ["certification", "certification.lte", "certification.gte"]:
+                if "certification_country" not in kwargs:
+                    raise Invalid("certification must be used with certification_country")
+                validated[k] = str(v)
+            elif k in ["include_adult", "include_video", "include_null_first_air_dates", "screened_theatrically"]:
+                if not isinstance(v, bool):
+                    raise Invalid(f"{k} must be either True or False")
+                validated[k] = v
+            elif k in ["primary_release_date.gte", "primary_release_date.lte", "release_date.gte", "release_date.lte",
+                       "air_date.gte", "air_date.lte", "first_air_date.gte", "first_air_date.lte"]:
+                if isinstance(v, datetime):
+                    date_obj = v
+                else:
+                    try:
+                        date_obj = datetime.strptime(str(v), "%Y-%m-%d")
+                    except ValueError:
+                        raise Invalid(f"{k} must be a datetime object or match pattern YYYY-MM-DD (e.g. 2020-12-25)")
+                validated[k] = datetime.strftime(date_obj, "%Y-%m-%d")
+            elif k in ["primary_release_year", "first_air_date_year", "vote_count.gte", "vote_count.lte",
+                       "with_runtime.gte", "with_runtime.lte"]:
+                if not isinstance(v, int) or v < 1:
+                    raise Invalid(f"{k} must be an integer greater then 0")
+                validated[k] = v
+            elif k in ["vote_average.gte", "vote_average.lte"]:
+                if not isinstance(v, float) or v < 1:
+                    raise Invalid(f"{k} must be a number greater then 0.0")
+                validated[k] = v
+            elif k == "with_watch_monetization_types":
+                if "watch_region" not in kwargs:
+                    raise Invalid("with_watch_monetization_types must be used with watch_region")
+                if v not in ["flatrate", "free", "ads", "rent", "buy"]:
+                    raise Invalid(f"{v} is not a valid with_watch_monetization_types option. Options: [flatrate, free, ads, rent, or buy]")
+                validated[k] = v
+            else:
+                validated[k] = ",".join([str(x) for x in v]) if isinstance(v, list) else str(v)
+        return validated
+
     @property
     def language(self):
         return self._language
 
     @language.setter
     def language(self, language):
-        if language in self._languages:
-            self._language = language
+        if str(language).lower() in self._iso_639_1:
+            self._language = str(language).lower()
+        elif str(language).lower() in self._translations:
+            self._language = self._translations[str(language).lower()]
         else:
-            raise Invalid(f"Language: {language} Invalid")
+            raise Invalid(f"Language: {language} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
 
     @property
     def account_id(self):
@@ -215,7 +329,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return FavoriteMovies(self, sort_by=util.validate_sort(sort_by, v3, True), v3=v3)
+        return FavoriteMovies(self, sort_by=sort_by, v3=v3)
 
     def favorite_tv_shows(self, sort_by: Optional[str] = None, v3: bool = False):
         """ Paginated Object of TV shows you have marked as a favorite.
@@ -244,7 +358,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return FavoriteTVShows(self, sort_by=util.validate_sort(sort_by, v3, False), v3=v3)
+        return FavoriteTVShows(self, sort_by=sort_by, v3=v3)
 
     def rated_movies(self, sort_by: Optional[str] = None, v3: bool = False):
         """ Paginated Object of movies you have rated.
@@ -273,7 +387,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return RatedMovies(self, sort_by=util.validate_sort(sort_by, v3, True), v3=v3)
+        return RatedMovies(self, sort_by=sort_by, v3=v3)
 
     def rated_tv_shows(self, sort_by: Optional[str] = None, v3: bool = False):
         """ Paginated Object of TV shows you have rated.
@@ -302,7 +416,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return RatedTVShows(self, sort_by=util.validate_sort(sort_by, v3, False), v3=v3)
+        return RatedTVShows(self, sort_by=sort_by, v3=v3)
 
     def rated_episodes(self, sort_by: Optional[str] = None):
         """ Paginated Object of TV episodes you have rated.
@@ -322,7 +436,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return RatedEpisodes(self, sort_by=util.validate_sort(sort_by, True, False))
+        return RatedEpisodes(self, sort_by=sort_by)
 
     def movie_watchlist(self, sort_by: Optional[str] = None, v3: bool = False):
         """ Paginated Object of movies you have added to your watchlist.
@@ -351,7 +465,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return MovieWatchlist(self, sort_by=util.validate_sort(sort_by, v3, True), v3=v3)
+        return MovieWatchlist(self, sort_by=sort_by, v3=v3)
 
     def tv_show_watchlist(self, sort_by: Optional[str] = None, v3: bool = False):
         """ Paginated Object of TV shows you have added to your watchlist.
@@ -380,7 +494,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return TVShowWatchlist(self, sort_by=util.validate_sort(sort_by, v3, False), v3=v3)
+        return TVShowWatchlist(self, sort_by=sort_by, v3=v3)
 
     def movie_recommendations(self, sort_by: Optional[str] = None):
         """ Paginated Object of your personal movie recommendations. (V4 Lists Only)
@@ -406,7 +520,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return MovieRecommendations(self, sort_by=util.validate_sort(sort_by, False, True))
+        return MovieRecommendations(self, sort_by=sort_by)
 
     def tv_show_recommendations(self, sort_by: Optional[str] = None):
         """ Paginated Object of your personal TV show recommendations. (V4 Lists Only)
@@ -432,7 +546,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``sort_by`` is not a valid option.
         """
-        return TVShowRecommendations(self, sort_by=util.validate_sort(sort_by, False, False))
+        return TVShowRecommendations(self, sort_by=sort_by)
 
     def logout(self):
         """ End all V3 and V4 Authenticated Sessions """
@@ -494,8 +608,8 @@ class TMDbAPIs:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``start_date`` or ``end_date`` is in an incorrect format.
         """
         return [Movie(self, data) for data in self._api.changes_get_movie_change_list(
-            start_date=util.validate_date(start_date),
-            end_date=util.validate_date(end_date)
+            start_date=self._validate_date(start_date),
+            end_date=self._validate_date(end_date)
         )["results"]]
 
     def tv_change_list(self,
@@ -518,8 +632,8 @@ class TMDbAPIs:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``start_date`` or ``end_date`` is in an incorrect format.
         """
         return [TVShow(self, data) for data in self._api.changes_get_tv_change_list(
-            start_date=util.validate_date(start_date),
-            end_date=util.validate_date(end_date)
+            start_date=self._validate_date(start_date),
+            end_date=self._validate_date(end_date)
         )["results"]]
 
     def person_change_list(self,
@@ -542,8 +656,8 @@ class TMDbAPIs:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``start_date`` or ``end_date`` is in an incorrect format.
         """
         return [Person(self, data) for data in self._api.changes_get_person_change_list(
-            start_date=util.validate_date(start_date),
-            end_date=util.validate_date(end_date)
+            start_date=self._validate_date(start_date),
+            end_date=self._validate_date(end_date)
         )["results"]]
 
     def collection(self, collection_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Collection:
@@ -658,8 +772,10 @@ class TMDbAPIs:
                 with_keywords (Optional[str]): A comma separated list of keyword ID's. Only includes movies that have one of the ID's added as a keyword.
                 without_keywords (Optional[str]): Exclude items with certain keywords. You can comma and pipe separate these values to create an 'AND' or 'OR' logic.
                 with_runtime.gte (Optional[int]): Filter and only include movies that have a runtime that is greater or equal to a value.
-                with_runtime.lte (Optional[int]): Filter and only include movies that have a runtime that is less than or equal to a value..000
+                with_runtime.lte (Optional[int]): Filter and only include movies that have a runtime that is less than or equal to a value.
                 with_original_language (Optional[str]): Specify an ISO 639-1 string to filter results by their original language value.
+                with_title_translation (Optional[str]): Specify a Primary Translation string to filter results by their title translation value.
+                with_overview_translation (Optional[str]): Specify a Primary Translation string to filter results by their overview translation value.
                 with_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
                 watch_region (Optional[str]): An ISO 3166-1 code. Combine this filter with ``with_watch_providers`` in order to filter your results by a specific watch provider in a specific region.
                 with_watch_monetization_types (Optional[str]): In combination with ``watch_region``, you can filter by monetization type. Allowed Values: ``flatrate``, ``free``, ``ads``, ``rent``, ``buy``
@@ -670,7 +786,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When one of the attributes given is Invalid.
         """
-        return DiscoverMovies(self, **util.validate_discover(True, **kwargs))
+        return DiscoverMovies(self, **self._validate_discover(True, **kwargs))
 
     def discover_tv_shows(self, **kwargs) -> DiscoverTVShows:
         """ Discover TV shows by different types of data like average rating, number of votes, genres, the network they
@@ -709,6 +825,8 @@ class TMDbAPIs:
                 screened_theatrically (Optional[bool]): Filter results to include items that have been screened theatrically.
                 with_companies (Optional[str]): A comma separated list of production company ID's. Only include movies that have one of the ID's added as a production company.
                 with_keywords (Optional[str]): A comma separated list of keyword ID's. Only includes TV shows that have one of the ID's added as a keyword.
+                with_name_translation (Optional[str]): Specify a Primary Translation string to filter results by their name translation value.
+                with_overview_translation (Optional[str]): Specify a Primary Translation string to filter results by their overview translation value.
                 with_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
                 watch_region (Optional[str]): An ISO 3166-1 code. Combine this filter with ``with_watch_providers`` in order to filter your results by a specific watch provider in a specific region.
                 with_watch_monetization_types (Optional[str]): In combination with ``watch_region``, you can filter by monetization type. Allowed Values: ``flatrate``, ``free``, ``ads``, ``rent``, ``buy``
@@ -719,7 +837,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When one of the attributes given is Invalid.
         """
-        return DiscoverTVShows(self, **util.validate_discover(False, **kwargs))
+        return DiscoverTVShows(self, **self._validate_discover(False, **kwargs))
 
     def find_by_id(self, imdb_id: Optional[str] = None, freebase_mid: Optional[str] = None, freebase_id: Optional[str] = None,
                    tvdb_id: Optional[str] = None, tvrage_id: Optional[str] = None, facebook_id: Optional[str] = None,
@@ -836,14 +954,14 @@ class TMDbAPIs:
         if self._api4 and self._api4.has_write_token:
             list_id = self._v4_check(write=True).list_create_list(
                 name,
-                util.validate_language(iso_639_1, self._iso_639_1),
+                self._validate_language(iso_639_1),
                 description=description,
                 public=public,
-                iso_3166_1=util.validate_country(iso_3166_1, self._iso_3166_1)
+                iso_3166_1=self._validate_country(iso_3166_1)
             )["id"]
         else:
             list_id = self._api.lists_create_list(
-                name=name, description=description, language=util.validate_language(iso_639_1, self._iso_639_1)
+                name=name, description=description, language=self._validate_language(iso_639_1)
             )["list_id"]
         return self.list(list_id) if load else int(list_id)
 
@@ -883,7 +1001,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When the Country provided is not valid.
         """
-        return NowPlayingMovies(self, region=util.validate_country(region, self._iso_3166_1))
+        return NowPlayingMovies(self, region=self._validate_country(region))
 
     def popular_movies(self, region: Optional[Union[Country, str]] = None) -> PopularMovies:
         """ Paginated Object of Popular Movies on TMDb.
@@ -897,7 +1015,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When the Country provided is not valid.
         """
-        return PopularMovies(self, region=util.validate_country(region, self._iso_3166_1))
+        return PopularMovies(self, region=self._validate_country(region))
 
     def top_rated_movies(self, region: Optional[Union[Country, str]] = None) -> TopRatedMovies:
         """ Paginated Object of the Top Rated Movies on TMDb.
@@ -911,7 +1029,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When the Country provided is not valid.
         """
-        return TopRatedMovies(self, region=util.validate_country(region, self._iso_3166_1))
+        return TopRatedMovies(self, region=self._validate_country(region))
 
     def upcoming_movies(self, region: Optional[Union[Country, str]] = None) -> UpcomingMovies:
         """ Paginated Object of Upcoming Movies.
@@ -925,7 +1043,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When the Country provided is not valid.
         """
-        return UpcomingMovies(self, region=util.validate_country(region, self._iso_3166_1))
+        return UpcomingMovies(self, region=self._validate_country(region))
 
     def network(self, network_id: int, load: bool = True, partial: Optional[Union[bool, str]] = False) -> Network:
         """ Gets the :class:`~tmdbapis.objs.reload.Network` for the given id.
@@ -1069,8 +1187,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchMovies(self, query, include_adult=include_adult,
-                            region=util.validate_country(region, self._iso_3166_1),
+        return SearchMovies(self, query, include_adult=include_adult, region=self._validate_country(region),
                             year=year, primary_release_year=primary_release_year)
 
     def multi_search(self, query: str, include_adult: Optional[bool] = None,
@@ -1088,8 +1205,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchMulti(self, query, include_adult=include_adult,
-                           region=util.validate_country(region, self._iso_3166_1))
+        return SearchMulti(self, query, include_adult=include_adult, region=self._validate_country(region))
 
     def people_search(self, query: str, include_adult: Optional[bool] = None,
                       region: Optional[Union[Country, str]] = None) -> SearchPeople:
@@ -1106,8 +1222,7 @@ class TMDbAPIs:
             Raises:
                 :class:`~tmdbapis.exceptions.NotFound`: When no results are found for the search.
         """
-        return SearchPeople(self, query, include_adult=include_adult,
-                            region=util.validate_country(region, self._iso_3166_1))
+        return SearchPeople(self, query, include_adult=include_adult, region=self._validate_country(region))
 
     def tv_search(self, query: str, include_adult: Optional[bool] = None,
                   first_air_date_year: Optional[int] = None) -> SearchTVShows:

@@ -1,6 +1,5 @@
 from abc import abstractmethod
 from typing import Optional, Union
-
 from tmdbapis.objs.base import TMDbObj
 from tmdbapis.objs.mixin import Favorite, Rate, Watchlist
 

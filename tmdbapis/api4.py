@@ -1,12 +1,10 @@
 import logging
 from json.decoder import JSONDecodeError
 from typing import Dict, Optional, Union, List
-
 from requests import Session, Response
 from requests.exceptions import RequestException
-
-from tmdbapis import util
-from tmdbapis.exceptions import TMDbException, NotFound, Unauthorized, WritePermission, PrivateResource, Authentication
+from tmdbapis.exceptions import TMDbException, NotFound, Unauthorized, WritePermission, PrivateResource, \
+    Authentication, Invalid
 
 logger = logging.getLogger(__name__)
 
@@ -389,6 +387,16 @@ class API4:
         """
         return self._delete(f"/list/{list_id}")
 
+    def _items(self, items, comment=False):
+        json = {"items": []}
+        for item in items:
+            if "media_type" not in item or "media_id" not in item or item["media_type"] not in ["movie", "tv"] or \
+                    (comment and "comment" not in item):
+                error = "'media_type', 'media_id', and 'comment'" if comment else "'media_type' and 'media_id'"
+                raise Invalid(f"Each object must have {error}. 'media_type' must be either 'movie' or 'tv'")
+            json["items"].append({"media_type": item["media_type"], "media_id": int(item["media_id"])})
+        return json
+
     def list_add_items(self, list_id: int, items: List[Dict[str, Union[str, int]]]) -> Dict:
         """ `List Add Items <https://developers.themoviedb.org/4/list/add-items>`__
 
@@ -406,7 +414,7 @@ class API4:
                 list_id (int): List ID
                 items (List[Dict[str, Union[str, int]]]): List of items to add. Each item is a dictionary with the format {"media_type": str, "media_id": int}. ``media_type`` can either be ``movie`` or ``tv``.
         """
-        return self._post(f"/list/{list_id}/items", json=util.validate_items(items))
+        return self._post(f"/list/{list_id}/items", json=self._items(items))
 
     def list_update_items(self, list_id: int, items: List[Dict[str, Union[str, int]]]) -> Dict:
         """ `List Update Items <https://developers.themoviedb.org/4/list/update-items>`__
@@ -419,7 +427,7 @@ class API4:
                 list_id (int): List ID
                 items (List[Dict[str, Union[str, int]]]): List of items to update. Each item is a dictionary with the format {"media_type": str, "media_id": int, "comment": str}. ``media_type`` can either be ``movie`` or ``tv``.
         """
-        return self._put(f"/list/{list_id}/items", json=util.validate_items(items, comment=True))
+        return self._put(f"/list/{list_id}/items", json=self._items(items, comment=True))
 
     def list_remove_items(self, list_id: int, items: List[Dict[str, Union[str, int]]]) -> Dict:
         """ `List Remove Items <https://developers.themoviedb.org/4/list/remove-items>`__
@@ -432,7 +440,7 @@ class API4:
                 list_id (int): List ID
                 items (List[Dict[str, Union[str, int]]]): List of items to remove. Each item is a dictionary with the format {"media_type": str, "media_id": int}. ``media_type`` can either be ``movie`` or ``tv``.
         """
-        return self._delete(f"/list/{list_id}/items", json=util.validate_items(items))
+        return self._delete(f"/list/{list_id}/items", json=self._items(items))
 
     def list_check_item_status(self, list_id: int, media_id: int, media_type: str) -> Dict:
         """ `List Check Item Status <https://developers.themoviedb.org/4/list/check-item-status>`__
