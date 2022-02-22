@@ -156,12 +156,8 @@ class TMDbAPIs:
                 if is_movie and v not in discover_movie_sort_options or not is_movie and v not in discover_tv_sort_options:
                     raise Invalid(f"{v} is not a valid sort_by option")
                 validated[k] = v
-            elif k in ["region", "watch_region"]:
+            elif k in ["region"]:
                 validated[k] = self._validate_country(v).upper()
-            elif k == "with_original_language":
-                validated[k] = self._validate_language(v)
-            elif k in ["with_title_translation", "with_name_translation", "with_overview_translation"]:
-                validated[k] = self._validate_translation(v)
             elif k == "certification_country":
                 if "certification" not in kwargs and "certification.lte" not in kwargs and "certification.gte" not in kwargs:
                     raise Invalid("certification_country must be used with either certification, certification.lte, or certification.gte")
