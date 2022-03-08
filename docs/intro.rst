@@ -2,7 +2,7 @@ Welcome to TMDbAPIs Documentation!
 ==========================================================
 
 .. image:: https://img.shields.io/readthedocs/tmdbapis?style=plastic
-    :target: https://tmdbapis.readthedocs.io/en/latest/?badge=latest
+    :target: https://tmdbapis.metamanager.wiki
     :alt: Read the Docs
 
 .. image:: https://img.shields.io/github/v/release/meisnate12/TMDbAPIs?style=plastic
@@ -40,7 +40,7 @@ Installation & Documentation
 
 Documentation_ can be found at Read the Docs.
 
-.. _Documentation: http://tmdbapis.readthedocs.io/en/latest/
+.. _Documentation: https://tmdbapis.metamanager.wiki
 
 
 Using the Object API

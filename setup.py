@@ -30,7 +30,7 @@ setup(
       "requests"
     ],
     project_urls={
-      "Documentation": "https://tmdbapis.readthedocs.io/en/latest/",
+      "Documentation": "https://tmdbapis.metamanager.wiki",
       "Funding": "https://github.com/sponsors/meisnate12",
       "Source": "https://github.com/meisnate12/TMDbAPIs",
       "Issues": "https://github.com/meisnate12/TMDbAPIs/issues",

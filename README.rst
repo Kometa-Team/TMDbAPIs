@@ -2,7 +2,7 @@ Welcome to TMDbAPIs Documentation!
 ==========================================================
 
 .. image:: https://img.shields.io/readthedocs/tmdbapis?style=plastic
-    :target: https://tmdbapis.readthedocs.io/en/latest/?badge=latest
+    :target: https://tmdbapis.metamanager.wiki
     :alt: Read the Docs
 
 .. image:: https://img.shields.io/github/v/release/meisnate12/TMDbAPIs?style=plastic
@@ -40,7 +40,7 @@ Installation & Documentation
 
 Documentation_ can be found at Read the Docs.
 
-.. _Documentation: http://tmdbapis.readthedocs.io/en/latest/
+.. _Documentation: https://tmdbapis.metamanager.wiki
 
 
 Using the Object API
@@ -64,7 +64,7 @@ To create a TMDbAPIs Object you need your V3 API Key, which can be found followi
 Authenticating V3 API Token
 ----------------------------------------------------------
 
-To authenticate your TMDb V3 API Token you can either authenticate your TMDb V4 Token or use the `authenticate() <https://tmdbapis.readthedocs.io/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.authenticate>`_ method.
+To authenticate your TMDb V3 API Token you can either authenticate your TMDb V4 Token or use the `authenticate() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.authenticate>`_ method.
 
 .. code-block:: python
 
@@ -92,7 +92,7 @@ To save your authenticated session use the ``session_id`` Attribute.
     with open("session_id.txt", "w") as text_file:
         print(tmdb.session_id, file=text_file)
 
-To load the authenticated session use the ``session_id`` Parameter of the `TMDbAPIs <https://tmdbapis.readthedocs.io/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor.
+To load the authenticated session use the ``session_id`` Parameter of the `TMDbAPIs <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor.
 
 .. code-block:: python
 
@@ -110,7 +110,7 @@ To load the authenticated session use the ``session_id`` Parameter of the `TMDbA
 Adding TMDb V4 API Read Access Token
 ----------------------------------------------------------
 
-To gain read access to TMDb V4's API just provide you're TMDb V4 Access Token either using the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.readthedocs.io/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or by using the `v4_access_token() <https://tmdbapis.readthedocs.io/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
+To gain read access to TMDb V4's API just provide you're TMDb V4 Access Token either using the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or by using the `v4_access_token() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
 
 To gain read access to TMDb V4's API need your TMDb V4 Access Token, which can be found following `this guide <https://developers.themoviedb.org/3/getting-started/introduction>`_.
 
@@ -130,8 +130,8 @@ Authenticating TMDb V4 API Token
 To authenticate your TMDB V4 Read Access Token it is a multi step process.
 
 1. Add your TMDb V4 API Read Access Token.
-2. Authenticate the URL returned from `v4_authenticate() <https://tmdbapis.readthedocs.io/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_authenticate>`_.
-3. Once the URL has been authenticated you must approve it by running `v4_approved() <https://tmdbapis.readthedocs.io/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_approved>`_.
+2. Authenticate the URL returned from `v4_authenticate() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_authenticate>`_.
+3. Once the URL has been authenticated you must approve it by running `v4_approved() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_approved>`_.
 
 .. code-block:: python
 
@@ -167,7 +167,7 @@ To save your authenticated token use the ``v4_access_token`` Attribute.
     with open("access_token.txt", "w") as text_file:
         print(tmdb.v4_access_token, file=text_file)
 
-To load the authenticated token use the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.readthedocs.io/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or the `v4_access_token() <https://tmdbapis.readthedocs.io/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
+To load the authenticated token use the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or the `v4_access_token() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
 
 .. code-block:: python
 
