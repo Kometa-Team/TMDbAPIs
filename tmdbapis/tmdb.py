@@ -18,12 +18,12 @@ logger = logging.getLogger(__name__)
 
 discover_movie_options = [
     "region", "sort_by", "certification_country", "certification", "certification.lte", "certification.gte",
-    "include_adult", "include_video", "primary_release_year", "with_release_type", "year", "primary_release_date.gte",
-    "primary_release_date.lte", "release_date.gte", "release_date.lte", "vote_count.gte", "vote_count.lte",
+    "include_adult", "include_video", "primary_release_year", "primary_release_date.gte", "primary_release_date.lte",
+    "release_date.gte", "release_date.lte", "with_release_type", "year", "vote_count.gte", "vote_count.lte",
     "vote_average.gte", "vote_average.lte", "with_cast", "with_crew", "with_people", "with_companies", "with_genres",
-    "without_genres", "with_title_translation", "with_keywords", "without_keywords", "with_runtime.gte",
-    "with_runtime.lte", "with_original_language", "with_watch_providers", "watch_region",
-    "with_watch_monetization_types", "with_title_translation", "with_overview_translation"
+    "without_genres", "with_keywords", "without_keywords", "with_runtime.gte", "with_runtime.lte",
+    "with_original_language", "with_watch_providers", "watch_region", "with_watch_monetization_types",
+    "without_companies", "with_title_translation", "with_overview_translation"
 ]
 discover_movie_sort_options = [
     "popularity.asc", "popularity.desc", "release_date.asc", "release_date.desc", "revenue.asc", "revenue.desc",
@@ -35,8 +35,8 @@ discover_tv_options = [
     "timezone", "vote_average.gte", "vote_average.lte", "vote_count.gte", "vote_count.lte", "with_genres",
     "with_networks", "without_genres", "with_runtime.gte", "with_runtime.lte", "include_null_first_air_dates",
     "with_original_language", "without_keywords", "screened_theatrically", "with_companies", "with_keywords",
-    "with_watch_providers", "watch_region", "with_watch_monetization_types", "with_name_translation",
-    "with_overview_translation"
+    "with_watch_providers", "watch_region", "with_watch_monetization_types", "with_status", "with_type",
+    "without_companies", "with_name_translation", "with_overview_translation"
 ]
 discover_tv_sort_options = ["popularity.asc", "popularity.desc", "first_air_date.desc", "first_air_date.asc", "vote_average.asc", "vote_average.desc"]
 

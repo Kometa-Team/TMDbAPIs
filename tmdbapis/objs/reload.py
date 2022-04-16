@@ -528,7 +528,7 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
             rated (Union[float, bool]): Your rating for this Movie or false if you have not rated it. (Authentication Required)
             recommendations (:class:`~tmdbapis.objs.pagination.RecommendedMovies`): Pagination Object of Recommended Movies based on this Movie.
             release_date (datetime): Movie's Primary Release Date.
-            release_dates (Dict[str, :class:`~tmdbapis.objs.simple.ReleaseDate`]): Dictionary of Release Dates where the keys are the ISO 3166-1 Alpha-2 Country Codes.
+            release_dates (Dict[str, List[:class:`~tmdbapis.objs.simple.ReleaseDate`]]): Dictionary of Release Dates where the keys are the ISO 3166-1 Alpha-2 Country Codes.
             revenue (int): Movie's Revenue.
             reviews (class:`~tmdbapis.objs.pagination.MovieReviews`): Pagination Object of Movie Reviews for this Movie.
             runtime (int) Movie's Runtime.
@@ -903,7 +903,7 @@ class TVShow(TMDbReload, Favorite, Rate, Watchlist):
             next_episode_to_air (:class:`~tmdbapis.objs.reload.Episode`): Next Episode to Air.
             number_of_episodes (int): Number of Episodes in the TV Show.
             number_of_seasons (int): Number of Seasons in the TV Show.
-            origin_countries (:class:`~tmdbapis.objs.simple.Country`): Origin Countries of the TV Show.
+            origin_countries (List[:class:`~tmdbapis.objs.simple.Country`]): Origin Countries of the TV Show.
             original_language (:class:`~tmdbapis.objs.simple.Language`): Original Language of the TV Show.
             original_name (str): TV Show's Original Name.
             overview (str): TV Show Overview.
