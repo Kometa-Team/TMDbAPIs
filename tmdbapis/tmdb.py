@@ -81,7 +81,7 @@ class TMDbAPIs:
         self._languages = [v for k, v in self._translations.items()] + [v.iso_639_1 for k, v in self._iso_639_1.items()]
         self._image_url = f"{self._config.secure_base_image_url}original"
         self.language = language
-        self._include_language = f"{self.language[:2]},null" if len(self.language) > 2 else "null"
+        self._include_language = None
 
     @property
     def _movie_genre_lookup(self):

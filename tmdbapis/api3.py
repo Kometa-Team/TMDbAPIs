@@ -61,6 +61,7 @@ class API3:
                 url_params[key] = value
         request_url = f"{base_url}{path}"
         logger.debug(f"Request URL: {request_url}")
+        logger.debug(f"Request Params: {url_params}")
         if json is not None:
             logger.debug(f"Request JSON {json}")
         try:
