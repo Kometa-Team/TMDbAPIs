@@ -400,7 +400,7 @@ class Episode(TMDbReload, Rate):
         self.stills = self._parse(attrs=["images", "stills"], value_type="still", is_list=True)
         self.title = self.name
         self.translations = self._parse(attrs=["translations", "translations"], value_type="translation", is_list=True)
-        self.tv_id = self._parse(attrs="show_id", value_type="int") if self._tv_id is None else self._tv_id
+        self.tv_id = self._parse(attrs="show_id", value_type="int") if "show_id" in self._data else self._tv_id
         self.tvdb_id = self._parse(attrs=["external_ids", "tvdb_id"], value_type="int")
         self.tvrage_id = self._parse(attrs=["external_ids", "tvrage_id"], value_type="int")
         self.videos = self._parse(attrs=["videos", "results"], value_type="video", is_list=True)
@@ -833,7 +833,7 @@ class Season(TMDbReload):
         self.air_date = self._parse(attrs="air_date", value_type="date")
         self.cast = self._parse(attrs=["credits", "cast"], value_type="tv_cast", is_list=True)
         self.crew = self._parse(attrs=["credits", "crew"], value_type="tv_crew", is_list=True)
-        self.tv_id = self._tv_id
+        self.tv_id = self._parse(attrs="show_id", value_type="int") if "show_id" in self._data else self._tv_id
         self.episodes = self._parse(attrs="episodes", value_type="episode", is_list=True, key=self.tv_id)
         self.freebase_id = self._parse(attrs=["external_ids", "freebase_id"])
         self.freebase_mid = self._parse(attrs=["external_ids", "freebase_mid"])
