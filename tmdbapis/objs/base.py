@@ -57,7 +57,9 @@ class TMDbObj(ABC):
 
     def __getattribute__(self, item):
         value = super().__getattribute__(item)
-        if item.startswith("_") or self._loading or not self._partial or value is not None:
+        if item.startswith("_") or self._loading or not self._partial or \
+                (isinstance(value, (list, dict, int, float)) and value) or \
+                (not isinstance(value, (list, dict, int, float)) and value is not None):
             return value
         self._load(None)
         return super().__getattribute__(item)
