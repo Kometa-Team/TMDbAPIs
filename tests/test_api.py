@@ -60,7 +60,7 @@ class APITests(unittest.TestCase):
 
     def test_companies(self):
         company = self.api.company(1)
-        self.assertEqual(company.name, "Lucasfilm")
+        self.assertEqual(company.name, "Lucasfilm Ltd.")
         self.assertGreater(len(company.movies), 0)
 
     def test_credit(self):

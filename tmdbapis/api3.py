@@ -75,7 +75,7 @@ class API3:
                 self.response = self._session.get(request_url, params=url_params)
             response_json = self.response.json()
         except (RequestException, JSONDecodeError) as e:
-            raise TMDbException(f"Failed to Connect to {base_url}: {e}")
+            raise TMDbException(f"Failed to Connect to {request_url}: {e}\nParams: {url_params}")
         logger.debug(f"Response ({self.response.status_code} [{self.response.reason}]) {response_json}")
         if self.response.status_code == 401:
             if "status_code" in response_json:
