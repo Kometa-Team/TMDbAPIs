@@ -58,8 +58,7 @@ class TMDbAPIs:
             v4_account_id (str): TMDb V4 Account ID.
             v4_access_token (str):  TMDb V4 Access Token.
     """
-    def __init__(self, apikey: str, session_id: Optional[str] = None, v4_access_token: Optional[str] = None, language="en", session: Optional[Session] = None):
-        self._language = None
+    def __init__(self, apikey: str, session_id: Optional[str] = None, v4_access_token: Optional[str] = None, language = None, session: Optional[Session] = None):
         self._session = Session() if session is None else session
         self._api4 = API4(v4_access_token, session=self._session) if v4_access_token else None
         self._api = API3(apikey, session_id=session_id, api4=self._api4, session=self._session, validate=False)
@@ -201,14 +200,14 @@ class TMDbAPIs:
 
     @property
     def language(self):
-        return self._language
+        return self.language
 
     @language.setter
     def language(self, language):
         if str(language).lower() in self._iso_639_1:
-            self._language = str(language).lower()
+            self.language = str(language).lower()
         elif str(language).lower() in self._translations:
-            self._language = self._translations[str(language).lower()]
+            self.language = self._translations[str(language).lower()]
         else:
             raise Invalid(f"Language: {language} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
 
