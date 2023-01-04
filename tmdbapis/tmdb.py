@@ -52,7 +52,8 @@ class TMDbAPIs:
             session (Optional[Session]): Use you're own Session object
 
         Attributes:
-            language (str): TMDb Language
+            language (str): TMDb Language.
+            include_language (str): Comma-separated list of TMDb Languages to have included with images and videos.
             account_id (int): TMDb V3 Account ID.
             session_id (str): TMDb V3 Session ID.
             v4_account_id (str): TMDb V4 Account ID.
@@ -200,17 +201,40 @@ class TMDbAPIs:
         return validated
 
     @property
+    def include_language(self):
+        return self._include_language
+
+    @include_language.setter
+    def include_language(self, include_language):
+        if include_language is None:
+            self._include_language = None
+        else:
+            final = []
+            for lang in str(include_language).split(","):
+                if str(lang).lower() in ["null", "none"]:
+                    final.append("null")
+                elif str(lang).lower() in self._iso_639_1:
+                    final.append(str(lang).lower())
+                elif str(lang).lower() in self._translations:
+                    final.append(self._translations[str(lang).lower()])
+                else:
+                    raise Invalid(f"Language: {lang} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
+            self._include_language = ",".join(final)
+
+    @property
     def language(self):
         return self._language
 
     @language.setter
-    def language(self, language):
-        if str(language).lower() in self._iso_639_1:
-            self._language = str(language).lower()
-        elif str(language).lower() in self._translations:
-            self._language = self._translations[str(language).lower()]
+    def language(self, lang):
+        if lang is None:
+            self._language = None
+        elif str(lang).lower() in self._iso_639_1:
+            self._language = str(lang).lower()
+        elif str(lang).lower() in self._translations:
+            self._language = self._translations[str(lang).lower()]
         else:
-            raise Invalid(f"Language: {language} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
+            raise Invalid(f"Language: {lang} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
 
     @property
     def account_id(self):
