@@ -58,7 +58,7 @@ class TMDbAPIs:
             v4_account_id (str): TMDb V4 Account ID.
             v4_access_token (str):  TMDb V4 Access Token.
     """
-    def __init__(self, apikey: str, session_id: Optional[str] = None, v4_access_token: Optional[str] = None, language = None, session: Optional[Session] = None):
+    def __init__(self, apikey: str, session_id: Optional[str] = None, v4_access_token: Optional[str] = None, language: Optional[str] = None, session: Optional[Session] = None):
         self._session = Session() if session is None else session
         self._api4 = API4(v4_access_token, session=self._session) if v4_access_token else None
         self._api = API3(apikey, session_id=session_id, api4=self._api4, session=self._session, validate=False)
