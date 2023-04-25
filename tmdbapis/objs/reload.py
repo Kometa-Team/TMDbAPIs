@@ -356,7 +356,7 @@ class Episode(TMDbReload, Rate):
             order (int): Episode Order in Group.
             overview (str): Episode Overview.
             production_code (str): Episode Production Code.
-            rated (Union[float, bool]): Either your TMDb Rating for the Episode or False if there is no rating.
+            rated (float): Either your TMDb Rating for the Episode or None if there is no rating.
             season_number (int): Season the Episode is in.
             still_path (str): Still Path.
             still_url (str): Still Full URL.
@@ -390,10 +390,7 @@ class Episode(TMDbReload, Rate):
         self.order = self._parse(attrs="order", value_type="int") if "order" in self._data else None
         self.overview = self._parse(attrs="overview")
         self.production_code = self._parse(attrs="production_code")
-        try:
-            self.rated = self._parse(attrs=["account_states", "rated"], value_type="float")
-        except ValueError:
-            self.rated = self._parse(attrs=["account_states", "rated"], value_type="bool")
+        self.rated = self._parse(attrs=["account_states", "rated", "value"], value_type="float", default_is_none=True)
         self.season_number = self._parse(attrs="season_number", value_type="int")
         self.still_path = self._parse(attrs="still_path")
         self.still_url = self._image_url(self.still_path)
@@ -525,7 +522,7 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
             poster_path (str): Poster Path.
             poster_url (str): Poster Full URL.
             posters (List[:class:`~tmdbapis.objs.image.Poster`]): List of other Posters for the Movie.
-            rated (Union[float, bool]): Your rating for this Movie or false if you have not rated it. (Authentication Required)
+            rated (float): Your rating for this Movie or None if you have not rated it. (Authentication Required)
             recommendations (:class:`~tmdbapis.objs.pagination.RecommendedMovies`): Pagination Object of Recommended Movies based on this Movie.
             release_date (datetime): Movie's Primary Release Date.
             release_dates (Dict[str, List[:class:`~tmdbapis.objs.simple.ReleaseDate`]]): Dictionary of Release Dates where the keys are the ISO 3166-1 Alpha-2 Country Codes.
@@ -580,10 +577,7 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
         self.poster_path = self._parse(attrs="poster_path")
         self.poster_url = self._image_url(self.poster_path)
         self.posters = self._parse(attrs=["images", "posters"], value_type="poster", is_list=True)
-        try:
-            self.rated = self._parse(attrs=["account_states", "rated"], value_type="float")
-        except ValueError:
-            self.rated = self._parse(attrs=["account_states", "rated"], value_type="bool")
+        self.rated = self._parse(attrs=["account_states", "rated", "value"], value_type="float", default_is_none=True)
         self.recommendations = self._parse(attrs="recommendations", value_type="recommended_movies", key=self.id)
         self.release_date = self._parse(attrs="release_date", value_type="date")
         self.release_dates = {}
@@ -911,7 +905,7 @@ class TVShow(TMDbReload, Favorite, Rate, Watchlist):
             poster_path (str): Poster Path.
             poster_url (str): Poster Full URL.
             posters (List[:class:`~tmdbapis.objs.image.Poster`]): List of other Posters for the TV Show.
-            rated (Union[float, bool]): Your rating for this TV Show or false if you have not rated it. (Authentication Required)
+            rated (float): Your rating for this TV Show or None if you have not rated it. (Authentication Required)
             recommendations (:class:`~tmdbapis.objs.pagination.RecommendedTVShows`): Pagination Object of Recommended TV Show based on this TV Show.
             seasons (List[:class:`~tmdbapis.objs.reload.Season`]): List of Seasons in the TV Show.
             similar (class:`~tmdbapis.objs.pagination.SimilarTVShows`): Pagination Object of Similar TV Show to this TV Show.
@@ -977,10 +971,7 @@ class TVShow(TMDbReload, Favorite, Rate, Watchlist):
         self.poster_path = self._parse(attrs="poster_path")
         self.poster_url = self._image_url(self.poster_path)
         self.posters = self._parse(attrs=["images", "posters"], value_type="poster", is_list=True)
-        try:
-            self.rated = self._parse(attrs=["account_states", "rated"], value_type="float")
-        except ValueError:
-            self.rated = self._parse(attrs=["account_states", "rated"], value_type="bool")
+        self.rated = self._parse(attrs=["account_states", "rated", "value"], value_type="float", default_is_none=True)
         self.recommendations = self._parse(attrs="recommendations", value_type="recommended_tv", key=self.id)
         self.seasons = self._parse(attrs="seasons", value_type="season", is_list=True, key=self.id)
         self.similar = self._parse(attrs="similar", value_type="similar_tv", key=self.id)
