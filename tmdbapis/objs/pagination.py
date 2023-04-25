@@ -763,6 +763,7 @@ class TMDbList(TMDbPagination):
             public=public,
             sort_by=sort_by
         )
+        self.reload()
 
     def _check_item(self, item):
         if isinstance(item, Movie):
@@ -828,6 +829,7 @@ class TMDbList(TMDbPagination):
         else:
             for item_id in item_ids:
                 self._api.lists_add_movie(self.id, item_id["media_id"])
+        self.reload()
 
     def remove_items(self, items: List[Union[Movie, TVShow, Tuple[int, str]]]):
         """ Adds the items given to the list.
@@ -850,6 +852,7 @@ class TMDbList(TMDbPagination):
         else:
             for item_id in item_ids:
                 self._api.lists_remove_movie(self.id, item_id["media_id"])
+        self.reload()
 
     def update_items(self, items: List[Tuple[Union[Movie, TVShow, Tuple[int, str]], str]]):
         """ Updates the items on the list.
@@ -868,6 +871,7 @@ class TMDbList(TMDbPagination):
             comment = item[1]
             item_ids.append({"media_type": item_type, "media_id": item_id, "comment": comment})
         self._tmdb._v4_check(write=True).list_update_items(self.id, item_ids)
+        self.reload()
 
     def clear(self):
         """ Clear all items from the list. """
@@ -875,6 +879,7 @@ class TMDbList(TMDbPagination):
             self._api4.list_clear_list(self.id)
         else:
             self._api.lists_clear_list(self.id, confirm=True)
+        self.reload()
 
     def delete(self):
         """ Delete the list. """
