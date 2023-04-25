@@ -24,7 +24,7 @@ class TMDbReload(TMDbObj):
 
     @abstractmethod
     def _full_load(self, partial=None):
-        pass
+        """ Abstract Full Load """
 
     def reload(self, partial: Optional[Union[bool, str]] = False):
         """ Reloads the object.

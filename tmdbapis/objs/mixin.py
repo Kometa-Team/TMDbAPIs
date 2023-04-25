@@ -14,7 +14,7 @@ class Favorite(ABC):
 
     @abstractmethod
     def _media_type(self):
-        pass
+        """ abstract media type """
 
 
 class Rate(ABC):
@@ -37,11 +37,11 @@ class Rate(ABC):
 
     @abstractmethod
     def _rate(self, rating):
-        pass
+        """ abstract rate """
 
     @abstractmethod
     def _delete_rate(self):
-        pass
+        """ abstract delete rate """
 
 
 class Watchlist(ABC):
@@ -55,4 +55,4 @@ class Watchlist(ABC):
 
     @abstractmethod
     def _media_type(self):
-        pass
+        """ abstract media type """

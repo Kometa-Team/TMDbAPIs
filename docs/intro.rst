@@ -1,6 +1,14 @@
 Welcome to TMDbAPIs Documentation!
 ==========================================================
 
+.. image:: https://img.shields.io/github/actions/workflow/status/meisnate12/TMDbAPIs/tests.yml?branch=master&style=plastic
+    :target: https://github.com/meisnate12/TMDbAPIs/actions/workflows/tests.yml
+    :alt: Build Testing
+
+.. image:: https://img.shields.io/codecov/c/github/meisnate12/TMDbAPIs?color=greenred&style=plastic
+    :target: https://codecov.io/gh/meisnate12/TMDbAPIs
+    :alt: Build Coverage
+
 .. image:: https://img.shields.io/readthedocs/tmdbapis?style=plastic
     :target: https://tmdbapis.metamanager.wiki
     :alt: Read the Docs
@@ -21,9 +29,30 @@ Welcome to TMDbAPIs Documentation!
     :target: https://github.com/meisnate12/TMDbAPIs/commits/master
     :alt: GitHub commits since latest release (by date) for a branch
 
+.. role:: raw-html(raw)
+    :format: html
+
+:raw-html:`<br />`
+
+.. image:: https://img.shields.io/discord/822460010649878528?color=%2300bc8c&label=Discord&style=plastic
+    :target: https://discord.gg/NfH6mGFuAB
+    :alt: Discord
+
+.. image:: https://img.shields.io/reddit/subreddit-subscribers/PlexMetaManager?color=%2300bc8c&label=r%2FPlexMetaManager&style=plastic
+    :target: https://www.reddit.com/r/PlexMetaManager/
+    :alt: Reddit
+
+.. image:: https://img.shields.io/readthedocs/plex-meta-manager?color=%2300bc8c&style=plastic
+    :target: https://tmdbapis.metamanager.wiki/en/latest/
+    :alt: Wiki
+
+.. image:: https://img.shields.io/github/sponsors/meisnate12?color=%238a2be2&style=plastic
+    :target: https://github.com/sponsors/meisnate12
+    :alt: GitHub Sponsors
+
 .. image:: https://img.shields.io/badge/-Sponsor_or_Donate-blueviolet?style=plastic
     :target: https://github.com/sponsors/meisnate12
-    :alt: GitHub Sponsor
+    :alt: Sponsor or Donate
 
 
 Overview

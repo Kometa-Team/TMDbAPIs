@@ -95,7 +95,7 @@ class TMDbPagination(TMDbObj):
 
     @abstractmethod
     def _get_page(self, page):
-        pass
+        """ abstract get page """
 
     def get_results(self, amount: Optional[int] = None):
         """ Gets the amount of results asked for from multiple pages. This method can make alot of calls to the API if you're not careful.
