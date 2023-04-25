@@ -1,18 +1,22 @@
 import logging
 from datetime import datetime
-from typing import Optional, Union, List, Dict
+from typing import Optional, Union, List, Dict, Any
 from requests import Session
 from tmdbapis.api3 import API3
 from tmdbapis.api4 import API4
 from tmdbapis.exceptions import Authentication, Invalid
-from tmdbapis.objs.pagination import NowPlayingMovies, PopularMovies, TopRatedMovies, UpcomingMovies, Trending, PopularPeople, \
-    TVShowsAiringToday, TVShowsOnTheAir, PopularTVShows, TopRatedTVShows, MovieRecommendations, TVShowRecommendations, \
-    SearchCompanies, SearchCollections, SearchKeywords, SearchMovies, SearchMulti, SearchPeople, SearchTVShows, \
-    CreatedLists, FavoriteMovies, FavoriteTVShows, RatedMovies, RatedTVShows, RatedEpisodes, MovieWatchlist, \
-    TVShowWatchlist, DiscoverMovies, DiscoverTVShows, TMDbList
-from tmdbapis.objs.reload import Account, Collection, Configuration, Company, Credit, Keyword, Movie, \
-    Network, Person, Review, TVShow, Season, Episode, EpisodeGroup
-from tmdbapis.objs.simple import Country, CountryCertifications, Genre, WatchProvider, FindResults, Language
+from tmdbapis.objs.image import Backdrop, Logo, Poster, Profile, Still, Tagged
+from tmdbapis.objs.pagination import NowPlayingMovies, PopularMovies, TopRatedMovies, UpcomingMovies, Trending, \
+    PopularPeople, TVShowsAiringToday, TVShowsOnTheAir, PopularTVShows, TopRatedTVShows, MovieRecommendations, \
+    TVShowRecommendations, SearchCompanies, SearchCollections, SearchKeywords, SearchMovies, SearchMulti, \
+    SearchPeople, SearchTVShows, CreatedLists, FavoriteMovies, FavoriteTVShows, RatedMovies, RatedTVShows, \
+    RatedEpisodes, MovieWatchlist, TVShowWatchlist, DiscoverMovies, DiscoverTVShows, TMDbList, MovieReviews, \
+    MovieLists, RecommendedMovies, SimilarMovies, RecommendedTVShows, SimilarTVShows, TaggedImages
+from tmdbapis.objs.reload import Account, Collection, Configuration, Company, Credit, Keyword, Movie, Network, \
+    Person, Review, TVShow, Season, Episode, EpisodeGroup
+from tmdbapis.objs.simple import Country, CountryCertifications, Genre, WatchProvider, FindResults, Language, \
+    AlternativeName, AlternativeTitle, Certification, CountryWatchProviders, Department, Group, ReleaseDate, Timezones, \
+    Trailer, Translation, User, Video
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +116,197 @@ class TMDbAPIs:
             return object_check(lookup, "id", self._tv_genre_lookup, is_int=True)
         else:
             return None
+
+    def _parse(self, data=None, attrs: Optional[Union[str, list]] = None, value_type: str = "str",
+               default_is_none: bool = False, is_list: bool = False, is_dict: bool = False, extend: bool = False,
+               key: Any = None):
+        """ Validate the value given from the options given.
+
+            Parameters:
+                attrs (Optional[Union[str, list]]): check data for these attributes.
+                value_type (str): Type that the value is.
+                default_is_none (bool): Makes default None.
+                is_list (bool): value is list of values.
+                is_dict (bool): value is dict of values.
+                extend (bool): value is list of values.
+                key (Any): extra key.
+
+            Returns:
+                Any: Parsed Value
+        """
+
+        if default_is_none is False and value_type in ["int", "float"]:
+            default = 0
+        elif default_is_none is False and is_list:
+            default = []
+        else:
+            default = None
+
+        value = data
+        if attrs:
+            if not isinstance(attrs, list):
+                attrs = [attrs]
+            for attr in attrs:
+                if isinstance(value, dict) and attr in value:
+                    value = value[attr]
+                else:
+                    return default
+
+        if value is None:
+            return default
+        elif extend:
+            export_list = []
+            for v in value:
+                export_list.extend(self._parse(data=v, value_type=value_type, default_is_none=default_is_none, key=key))
+            return export_list
+        elif is_list:
+            return [self._parse(data=v, value_type=value_type, default_is_none=default_is_none, key=key) for v in value]
+        elif is_dict:
+            return {k: self._parse(data=v, value_type=value_type, default_is_none=default_is_none, key=k)
+                    for k, v in value.items()}
+        elif value_type == "int":
+            return int(value)
+        elif value_type == "float":
+            return float(value)
+        elif value_type == "bool":
+            if isinstance(value, bool):
+                return value
+            elif str(value).lower() in ["t", "true", "1", "y", "yes"]:
+                return True
+            elif str(value).lower() in ["f", "false", "0", "n", "no"]:
+                return False
+            else:
+                return default
+        elif value_type == "date":
+            if not value:
+                return None
+            elif "T" in value:
+                return datetime.strptime(value[:-1].split(".")[0], "%Y-%m-%dT%H:%M:%S")
+            else:
+                return datetime.strptime(value, "%Y-%m-%d")
+        elif value_type == "dict":
+            return value
+        elif value_type == "alternative_name":
+            return AlternativeName(self, value)
+        elif value_type == "alternative_title":
+            return AlternativeTitle(self, value)
+        elif value_type == "certification":
+            return Certification(self, value)
+        elif value_type == "load_country":
+            return Country(self, value)
+        elif value_type == "country_certification":
+            return CountryCertifications(self, value, key)
+        elif value_type == "country_watch_provider":
+            return CountryWatchProviders(self, value, key)
+        elif value_type == "load_department":
+            return Department(self, value)
+        elif value_type == "load_genre":
+            return Genre(self, value)
+        elif value_type == "group":
+            return Group(self, value)
+        elif value_type == "load_language":
+            return Language(self, value)
+        elif value_type == "release_date":
+            return ReleaseDate(self, value)
+        elif value_type == "load_timezone":
+            return Timezones(self, value)
+        elif value_type == "trailer":
+            return Trailer(self, value)
+        elif value_type == "translation":
+            return Translation(self, value)
+        elif value_type == "user":
+            return User(self, value)
+        elif value_type == "video":
+            return Video(self, value)
+        elif value_type == "watch_provider":
+            return WatchProvider(self, value)
+        elif value_type == "backdrop":
+            return Backdrop(self, value)
+        elif value_type == "logo":
+            return Logo(self, value)
+        elif value_type == "poster":
+            return Poster(self, value)
+        elif value_type == "profile":
+            return Profile(self, value)
+        elif value_type == "still":
+            return Still(self, value)
+        elif value_type == "tagged":
+            return Tagged(self, value)
+        elif value_type == "collection":
+            return Collection(self, value)
+        elif value_type == "company":
+            return Company(self, value)
+        elif value_type == "movie_cast":
+            return Credit(self, value, credit_type="cast", media_type="movie")
+        elif value_type == "movie_crew":
+            return Credit(self, value, credit_type="crew", media_type="movie")
+        elif value_type == "tv_cast":
+            return Credit(self, value, credit_type="cast", media_type="tv")
+        elif value_type == "tv_crew":
+            return Credit(self, value, credit_type="crew", media_type="tv")
+        elif value_type == "agg_tv_cast":
+            cast = []
+            for role in value["roles"]:
+                new_dict = value.copy()
+                for k, v in role.items():
+                    new_dict[k] = v
+                cast.append(Credit(self, new_dict, credit_type="cast", media_type="tv"))
+            return cast
+        elif value_type == "agg_tv_crew":
+            crew = []
+            for role in value["jobs"]:
+                new_dict = value.copy()
+                for k, v in role.items():
+                    new_dict[k] = v
+                crew.append(Credit(self, new_dict, credit_type="crew", media_type="tv"))
+            return crew
+        elif value_type == "keyword":
+            return Keyword(self, value)
+        elif value_type == "movie":
+            return Movie(self, value)
+        elif value_type == "network":
+            return Network(self, value)
+        elif value_type == "person":
+            return Person(self, value)
+        elif value_type == "review":
+            return Review(self, value)
+        elif value_type == "tv":
+            return TVShow(self, value)
+        elif value_type == "season":
+            return Season(self, value, key)
+        elif value_type == "episode":
+            return Episode(self, value, key)
+        elif value_type == "episode_group":
+            return EpisodeGroup(self, value, key)
+        elif value_type == "media_type":
+            if value["media_type"] == "movie":
+                return Movie(self, value)
+            elif value["media_type"] == "tv":
+                return TVShow(self, value)
+            elif value["media_type"] == "person":
+                return Person(self, value)
+        elif value_type == "list":
+            return TMDbList(self, value)
+        elif value_type == "movie_reviews":
+            return MovieReviews(self, value, key)
+        elif value_type == "lists":
+            return MovieLists(self, value, key)
+        elif value_type == "recommended_movies":
+            return RecommendedMovies(self, value, key)
+        elif value_type == "similar_movies":
+            return SimilarMovies(self, value, key)
+        elif value_type == "recommended_tv":
+            return RecommendedTVShows(self, value, key)
+        elif value_type == "similar_tv":
+            return SimilarTVShows(self, value, key)
+        elif value_type == "tagged_images":
+            return TaggedImages(self, value, key)
+        elif value_type == "content_rating":
+            return {v["iso_3166_1"]: v["rating"] for v in value}
+        elif value_type in ["country", "language", "movie_genre", "tv_genre"]:
+            return self._get_object(value, value_type)
+        else:
+            return str(value)
 
     def _validate_language(self, language):
         if isinstance(language, Language):
