@@ -439,7 +439,7 @@ class SearchCollections(TMDbPagination):
         super().__init__(tmdb, None, "collection", "SearchCollections")
 
     def _get_page(self, page):
-        results = self._api.search_search_collections(self.query, language=self._tmdb.language, page=self.page)
+        results = self._api.search_search_collections(self.query, language=self._tmdb.language, page=page)
         if int(results["total_results"]) > 0:
             return results
         raise NotFound("No Results Found")
@@ -458,7 +458,7 @@ class SearchCompanies(TMDbPagination):
         super().__init__(tmdb, None, "company", "SearchCompanies")
 
     def _get_page(self, page):
-        results = self._api.search_search_companies(self.query, page=self.page)
+        results = self._api.search_search_companies(self.query, page=page)
         if int(results["total_results"]) > 0:
             return results
         raise NotFound("No Results Found")
@@ -477,7 +477,7 @@ class SearchKeywords(TMDbPagination):
         super().__init__(tmdb, None, "keyword", "SearchKeywords")
 
     def _get_page(self, page):
-        results = self._api.search_search_keywords(self.query, page=self.page)
+        results = self._api.search_search_keywords(self.query, page=page)
         if int(results["total_results"]) > 0:
             return results
         raise NotFound("No Results Found")
@@ -507,7 +507,7 @@ class SearchMovies(TMDbPagination):
         results = self._api.search_search_movies(
             self.query,
             language=self._tmdb.language,
-            page=self.page,
+            page=page,
             include_adult=self.include_adult,
             region=self.region,
             year=self.year,
@@ -538,7 +538,7 @@ class SearchMulti(TMDbPagination):
         results = self._api.search_multi_search(
             self.query,
             language=self._tmdb.language,
-            page=self.page,
+            page=page,
             include_adult=self.include_adult,
             region=self.region
         )
@@ -567,7 +567,7 @@ class SearchPeople(TMDbPagination):
         results = self._api.search_search_people(
             self.query,
             language=self._tmdb.language,
-            page=self.page,
+            page=page,
             include_adult=self.include_adult,
             region=self.region
         )
@@ -596,7 +596,7 @@ class SearchTVShows(TMDbPagination):
         results = self._api.search_search_tv_shows(
             self.query,
             language=self._tmdb.language,
-            page=self.page,
+            page=page,
             include_adult=self.include_adult,
             first_air_date_year=self.first_air_date_year
         )
