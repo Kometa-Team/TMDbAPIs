@@ -97,16 +97,16 @@ class TMDbPagination(TMDbObj):
     def _get_page(self, page):
         pass
 
-    def get_results(self, amount: int):
+    def get_results(self, amount: Optional[int] = None):
         """ Gets the amount of results asked for from multiple pages. This method can make alot of calls to the API if you're not careful.
 
             Parameters:
-                amount (int): Amount of Items you want returned.
+                amount (Optional[int]): Amount of Items you want returned.
 
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``amount`` is not greater than zero.
          """
-        if int(amount) > self.total_results:
+        if amount is None or int(amount) > self.total_results:
             amount = self.total_results
         if amount < 1:
             raise Invalid("amount must be greater then 0")
