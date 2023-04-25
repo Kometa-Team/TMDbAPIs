@@ -881,7 +881,11 @@ class TMDbList(TMDbPagination):
         if self._api4 and self._api4.has_write_token:
             self._api4.list_delete_list(self.id)
         else:
-            self._api.lists_delete_list(self.id)
+            try:
+                self._api.lists_delete_list(self.id)
+            except TMDbException as e:
+                if not str(e).startswith("(500 [Internal Server Error])"):
+                    raise
 
 
 class TopRatedMovies(TMDbPagination):
