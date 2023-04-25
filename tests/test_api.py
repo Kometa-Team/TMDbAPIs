@@ -1,6 +1,7 @@
-import os, time, unittest
+import os, sys, time, unittest
 from datetime import datetime
 from dotenv import load_dotenv
+from github import Github
 from tmdbapis.api3 import API3
 from tmdbapis.exceptions import NotFound, Invalid, Authentication
 from tmdbapis.objs.reload import Movie, Person, TVShow
@@ -21,6 +22,36 @@ v4 = os.environ["TMDB_V4_TOKEN"]
 access = os.environ["TMDB_V4_ACCESS"]
 username = os.environ["TMDB_USERNAME"]
 password = os.environ["TMDB_PASSWORD"]
+gh_token = os.environ["PAT"]
+local = os.environ["LOCAL"] == "True"
+py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+
+movie_ids = {
+    "3.6": {"id": 11, "name": "Star Wars"},
+    "3.7": {"id": 1891, "name": "The Empire Strikes Back"},
+    "3.8": {"id": 1892, "name": "Return of the Jedi"},
+    "3.9": {"id": 1893, "name": "Star Wars: Episode I - The Phantom Menace"},
+    "3.10": {"id": 1894, "name": "Star Wars: Episode II - Attack of the Clones"},
+    "3.11": {"id": 1895, "name": "Star Wars: Episode III - Revenge of the Sith"},
+}
+
+show_ids = {
+    "3.6": {"id": 4194, "name": "Star Wars: The Clone Wars"},
+    "3.7": {"id": 105971, "name": "Star Wars: The Bad Batch"},
+    "3.8": {"id": 60554, "name": "Star Wars Rebels"},
+    "3.9": {"id": 203085, "name": "Star Wars: Tales of the Jedi"},
+    "3.10": {"id": 114478, "name": "Star Wars: Visions"},
+    "3.11": {"id": 79093, "name": "Star Wars Resistance"},
+}
+
+episode_ids = {
+    "3.6": {"id": 1, "name": "Ambush"},
+    "3.7": {"id": 2, "name": "Rising Malevolence"},
+    "3.8": {"id": 3, "name": "Shadow of Malevolence"},
+    "3.9": {"id": 4, "name": "Destroy Malevolence"},
+    "3.10": {"id": 5, "name": "Rookies"},
+    "3.11": {"id": 6, "name": "Downfall of a Droid"},
+}
 
 class APITests(unittest.TestCase):
 
@@ -64,8 +95,21 @@ class APITests(unittest.TestCase):
         self.api_v4_session.v4_access(v4)
         with self.assertRaises(Authentication):
             account.movie_recommendations()
-        print(f"\n\nApprove URL: {self.api_v4_session.v4_authenticate()}")
-        time.sleep(30)
+        v4_url = self.api_v4_session.v4_authenticate()
+        if local:
+            print(f"\n\nApprove URL: {v4_url}")
+            time.sleep(30)
+        else:
+            git = Github(gh_token)
+            repo = git.get_user("meisnate12").get_repo("TMDbAPIs")
+            issue_id = repo.create_issue(f"Run: {datetime.now().strftime('%Y-%m-%d %H:%M')} {py_version}", body=v4_url,
+                                         assignee="meisnate12", labels=["approval-needed"]).number
+            while True:
+                issue = repo.get_issue(issue_id)
+                if "approval-needed" not in [la.name for la in issue.labels]:
+                    issue.edit("Delete", body="delete", state="closed")
+                    break
+                time.sleep(10)
         self.api_v4_session.v4_approved()
         print("\ntest_aa_session: ", end="")
 
@@ -251,9 +295,9 @@ class APITests(unittest.TestCase):
             self.api.movie(10)
         with self.assertRaises(Invalid):
             self.api.now_playing_movies(region="fail")
-        movie = self.api.movie(11)
+        movie = self.api.movie(movie_ids[py_version]["id"])
         self.assertIsNotNone(str(movie.watch_providers))
-        self.assertEqual(movie.title, "Star Wars")
+        self.assertEqual(movie.title, movie_ids[py_version]["name"])
         self.assertIsInstance(self.api.latest_movie(), Movie)
         self.assertGreater(len(self.api.now_playing_movies(region="us")), 0)
         self.assertGreater(len(self.api.popular_movies(region=self.api._iso_3166_1["us"])), 0)
@@ -372,8 +416,8 @@ class APITests(unittest.TestCase):
 
     def test_tv_episode(self):
         print("\ntest_tv_episode: ", end="")
-        episode = self.api.tv_episode(4194, 1, 1)
-        self.assertEqual(episode.name, "Ambush")
+        episode = self.api.tv_episode(4194, 1, episode_ids[py_version]["id"])
+        self.assertEqual(episode.name, episode_ids[py_version]["name"])
         with self.assertRaises(Invalid):
             episode.rate(11.0)
         episode.rate(8.5)
@@ -399,8 +443,8 @@ class APITests(unittest.TestCase):
 
     def test_tv_show(self):
         print("\ntest_tv_show: ", end="")
-        show = self.api.tv_show(4194)
-        self.assertEqual(show.name, "Star Wars: The Clone Wars")
+        show = self.api.tv_show(show_ids[py_version]["id"])
+        self.assertEqual(show.name, show_ids[py_version]["name"])
         self.assertIsInstance(self.api.latest_tv(), TVShow)
         self.assertGreater(len(self.api.tv_airing_today()), 0)
         self.assertGreater(len(self.api.tv_on_the_air()), 0)

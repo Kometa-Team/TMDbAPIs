@@ -1,10 +1,13 @@
 name: Run Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
 
 jobs:
   run-tests:
-
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -26,6 +29,15 @@ jobs:
           python setup.py install
 
       - name: Run tests
+        env:
+          TMDB_APIKEY: ${{ secrets.TMDB_APIKEY }}
+          TMDB_SESSION: ${{ secrets.TMDB_SESSION }}
+          TMDB_V4_ACCESS: ${{ secrets.TMDB_V4_ACCESS }}
+          TMDB_V4_TOKEN: ${{ secrets.TMDB_V4_TOKEN }}
+          TMDB_USERNAME: ${{ secrets.TMDB_USERNAME }}
+          TMDB_PASSWORD: ${{ secrets.TMDB_PASSWORD }}
+          PAT: ${{ secrets.PAT }}
+          LOCAL: False
         run: coverage run -m pytest -s --cov tmdbapis --cov-report xml tests/test*
 
       - name: Codecov coverage reports
@@ -33,3 +45,17 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
+
+  tag-new-versions:
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    needs: [run-tests]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT }}
+          fetch-depth: 2
+      - uses: salsify/action-detect-and-tag-new-version@v1.0.3
+        with:
+          version-command: |
+            cat VERSION
