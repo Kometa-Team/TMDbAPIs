@@ -4,7 +4,7 @@ from urllib.parse import urlparse, parse_qs
 
 from tmdbapis.objs.base import TMDbObj
 from tmdbapis.objs.reload import Movie, TVShow
-from tmdbapis.exceptions import NotFound, Invalid
+from tmdbapis.exceptions import NotFound, Invalid, TMDbException
 
 v3_sorts = ["created_at.asc", "created_at.desc"]
 v4_movie_sorts = ["created_at.asc", "created_at.desc", "release_date.asc", "release_date.desc", "title.asc", "title.desc", "vote_average.asc", "vote_average.desc"]
@@ -874,7 +874,7 @@ class TMDbList(TMDbPagination):
         if self._api4 and self._api4.has_write_token:
             self._api4.list_clear_list(self.id)
         else:
-            self._api.lists_clear_list(self.id, True)
+            self._api.lists_clear_list(self.id, confirm=True)
 
     def delete(self):
         """ Delete the list. """

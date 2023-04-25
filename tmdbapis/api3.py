@@ -58,7 +58,10 @@ class API3:
         url_params = {"api_key": f"{self.apikey}"}
         for key, value in kwargs.items():
             if value is not None:
-                url_params[key] = value
+                if isinstance(value, bool):
+                    url_params[key] = str(value).lower()
+                else:
+                    url_params[key] = value
         request_url = f"{base_url}{path}"
         logger.debug(f"Request URL: {request_url}")
         logger.debug(f"Request Params: {url_params}")
