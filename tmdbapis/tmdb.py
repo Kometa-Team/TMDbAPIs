@@ -146,7 +146,7 @@ class TMDbAPIs:
             try:
                 return datetime.strptime(str(data), date_format).strftime(date_format)
             except ValueError:
-                raise Invalid(f"date: {data} must be a datetime or in the format YYYY-MM-DD")
+                raise Invalid(f"date: {data} must be a datetime or in the format YYYY-MM-DD (e.g. 2020-12-25)")
 
     def _validate_discover(self, is_movie, **kwargs):
         validated = {}
@@ -168,33 +168,29 @@ class TMDbAPIs:
                     raise Invalid("certification must be used with certification_country")
                 validated[k] = str(v)
             elif k in ["include_adult", "include_video", "include_null_first_air_dates", "screened_theatrically"]:
-                if not isinstance(v, bool):
+                data = self._parse(data=v, value_type="bool")
+                if data is None:
                     raise Invalid(f"{k} must be either True or False")
                 validated[k] = v
             elif k in ["primary_release_date.gte", "primary_release_date.lte", "release_date.gte", "release_date.lte",
                        "air_date.gte", "air_date.lte", "first_air_date.gte", "first_air_date.lte"]:
-                if isinstance(v, datetime):
-                    date_obj = v
-                else:
-                    try:
-                        date_obj = datetime.strptime(str(v), "%Y-%m-%d")
-                    except ValueError:
-                        raise Invalid(f"{k} must be a datetime object or match pattern YYYY-MM-DD (e.g. 2020-12-25)")
-                validated[k] = datetime.strftime(date_obj, "%Y-%m-%d")
+                data = self._validate_date(v)
+                if data:
+                    validated[k] = data
             elif k in ["primary_release_year", "first_air_date_year", "vote_count.gte", "vote_count.lte",
                        "with_runtime.gte", "with_runtime.lte"]:
-                if not isinstance(v, int) or v < 1:
+                if not isinstance(v, int) or v <= 0:
                     raise Invalid(f"{k} must be an integer greater then 0")
                 validated[k] = v
             elif k in ["vote_average.gte", "vote_average.lte"]:
-                if not isinstance(v, float) or v < 1:
+                if not isinstance(v, (int, float)) or v <= 0:
                     raise Invalid(f"{k} must be a number greater then 0.0")
-                validated[k] = v
+                validated[k] = float(v)
             elif k == "with_watch_monetization_types":
-                if "watch_region" not in kwargs:
-                    raise Invalid("with_watch_monetization_types must be used with watch_region")
                 if v not in ["flatrate", "free", "ads", "rent", "buy"]:
                     raise Invalid(f"{v} is not a valid with_watch_monetization_types option. Options: [flatrate, free, ads, rent, or buy]")
+                if "watch_region" not in kwargs:
+                    raise Invalid("with_watch_monetization_types must be used with watch_region")
                 validated[k] = v
             else:
                 validated[k] = ",".join([str(x) for x in v]) if isinstance(v, list) else str(v)
@@ -215,10 +211,11 @@ class TMDbAPIs:
                     final.append("null")
                 elif str(lang).lower() in self._iso_639_1:
                     final.append(str(lang).lower())
-                elif str(lang).lower() in self._translations:
-                    final.append(self._translations[str(lang).lower()])
                 else:
-                    raise Invalid(f"Language: {lang} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
+                    try:
+                        final.append(self._validate_translation(lang))
+                    except Invalid:
+                        raise Invalid(f"Language: {lang} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
             self._include_language = ",".join(final)
 
     @property
@@ -231,10 +228,11 @@ class TMDbAPIs:
             self._language = None
         elif str(lang).lower() in self._iso_639_1:
             self._language = str(lang).lower()
-        elif str(lang).lower() in self._translations:
-            self._language = self._translations[str(lang).lower()]
         else:
-            raise Invalid(f"Language: {lang} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
+            try:
+                self._language = self._validate_translation(lang)
+            except Invalid:
+                raise Invalid(f"Language: {lang} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
 
     @property
     def account_id(self):
@@ -586,10 +584,8 @@ class TMDbAPIs:
                 Dict[str, :class:`~tmdbapis.objs.simple.CountryCertifications`]
         """
         if reload or self._movie_certifications is None:
-            self._movie_certifications = {
-                k: CountryCertifications(self, v, k) for k, v in
-                self._api.certifications_get_movie_certifications()["certifications"].items()
-            }
+            self._movie_certifications = self._parse(data=self._api.certifications_get_movie_certifications(),
+                                                     attrs="certifications", value_type="country_certification", is_dict=True)
         return self._movie_certifications
 
     def tv_certifications(self, reload: bool = False) -> Dict[str, CountryCertifications]:
@@ -602,10 +598,8 @@ class TMDbAPIs:
                 Dict[str, :class:`~tmdbapis.objs.simple.CountryCertifications`]
         """
         if reload or self._tv_certifications is None:
-            self._tv_certifications = {
-                k: CountryCertifications(self, v, k) for k, v in
-                self._api.certifications_get_tv_certifications()["certifications"].items()
-            }
+            self._tv_certifications = self._parse(data=self._api.certifications_get_tv_certifications(),
+                                                  attrs="certifications", value_type="country_certification", is_dict=True)
         return self._tv_certifications
 
     def movie_change_list(self,
@@ -910,7 +904,8 @@ class TMDbAPIs:
                 List[:class:`~tmdbapis.objs.simple.Genre`]
         """
         if reload or self._movie_genres is None:
-            self._movie_genres = [Genre(self, g) for g in self._api.genres_get_movie_list()["genres"]]
+            self._movie_genres = self._parse(data=self._api.genres_get_movie_list(),
+                                             attrs="genres", value_type="load_genre", is_list=True)
         return self._movie_genres
 
     def tv_genres(self, reload: bool = False) -> List[Genre]:
@@ -923,7 +918,8 @@ class TMDbAPIs:
                 List[:class:`~tmdbapis.objs.simple.Genre`]
         """
         if reload or self._tv_genres is None:
-            self._tv_genres = [Genre(self, g) for g in self._api.genres_get_tv_list()["genres"]]
+            self._tv_genres = self._parse(data=self._api.genres_get_tv_list(),
+                                          attrs="genres", value_type="load_genre", is_list=True)
         return self._tv_genres
 
     def keyword(self, keyword_id: int, load: bool = True) -> Keyword:
