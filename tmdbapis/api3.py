@@ -1106,7 +1106,7 @@ class API3:
         """
         return self._get(f"/keyword/{keyword_id}/movies", language=language, include_adult=include_adult)
 
-    def lists_get_details(self, list_id: int, language: Optional[str] = None) -> Dict:
+    def lists_get_details(self, list_id: int, language: Optional[str] = None, page: Optional[str] = None) -> Dict:
         """ `Lists Get Details <https://developers.themoviedb.org/3/lists/get-list-details>`__
 
             Get the details of a list.
@@ -1114,8 +1114,9 @@ class API3:
             Parameters:
                 list_id (int): List ID.
                 language (Optional[str]): ISO-639-1 or ISO-3166-1 value to display translated data for the fields that support it.
+                page (Optional[int]): Specify which page to query.
         """
-        return self._get(f"/list/{list_id}", language=language)
+        return self._get(f"/list/{list_id}", language=language, page=page)
 
     def lists_check_item_status(self, list_id: int, movie_id: int) -> Dict:
         """ `Lists Check Item Status <https://developers.themoviedb.org/3/lists/check-item-status>`__

@@ -25,7 +25,6 @@ class TMDbPagination(TMDbObj):
         self._page_type = page_type
         self._results_text = None
         self._total_results_text = None
-        self._single_load = False
         self._page_storage = {}
         self._params = parse_qs(urlparse(tmdb._api.response.url).query)
         self._loading = True
@@ -36,8 +35,8 @@ class TMDbPagination(TMDbObj):
     def _load(self, data):
         self._partial = data is not None
         super()._load(self._get_page(1) if data is None else data)
-        self.page = 1 if self._single_load else self._parse(attrs="page", value_type="int")
-        self.total_pages = 1 if self._single_load else self._parse(attrs="total_pages", value_type="int")
+        self.page = self._parse(attrs="page", value_type="int")
+        self.total_pages = self._parse(attrs="total_pages", value_type="int")
         if self._total_results_text:
             self.total_results = self._parse(attrs=self._total_results_text, value_type="int")
             setattr(self, self._total_results_text, self.total_results)
@@ -686,14 +685,8 @@ class TMDbList(TMDbPagination):
 
     def _load(self, data):
         self._partial = data is not None
-        if self._api4:
-            self._results_text = None
-            self._total_results_text = None
-            self._single_load = False
-        else:
-            self._results_text = "items"
-            self._total_results_text = "item_count"
-            self._single_load = True
+        self._results_text = None if self._api4 else "items"
+        self._total_results_text = None if self._api4 else "item_count"
         super()._load(self._get_page(1) if data is None else data)
         self._loading = True
         self.description = self._parse(attrs="description")
@@ -732,7 +725,8 @@ class TMDbList(TMDbPagination):
         else:
             return self._api.lists_get_details(
                 self.id,
-                language=self._tmdb.language
+                language=self._tmdb.language,
+                page=page
             )
 
     def reload(self):
