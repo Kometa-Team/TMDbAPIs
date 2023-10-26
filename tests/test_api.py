@@ -1,5 +1,5 @@
 import os, sys, time, unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from github import Github
 from tmdbapis.api3 import API3
@@ -156,7 +156,7 @@ class APITests(unittest.TestCase):
         now = datetime.now()
         with self.assertRaises(Invalid):
             self.api.movie_change_list(start_date=f"fa/01/{now.year}")
-        self.assertGreater(len(self.api.movie_change_list(start_date=f"{now.year}-01-01", end_date=now)), 0)
+        self.assertGreater(len(self.api.movie_change_list(start_date=now - timedelta(days=7), end_date=now)), 0)
         self.assertGreater(len(self.api.movie_change_list()), 0)
         self.assertGreater(len(self.api.tv_change_list()), 0)
         self.assertGreater(len(self.api.person_change_list()), 0)
@@ -425,9 +425,9 @@ class APITests(unittest.TestCase):
         episode.reload()
         time.sleep(2)
         self.assertEqual(episode.rated, 8.5)
-        time.sleep(2)
+        time.sleep(4)
         episode.delete_rating()
-        time.sleep(2)
+        time.sleep(4)
         episode.reload()
         self.assertIsNone(episode.rated)
 
