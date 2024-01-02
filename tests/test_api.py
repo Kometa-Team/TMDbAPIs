@@ -26,6 +26,9 @@ gh_token = os.environ["PAT"]
 local = os.environ["LOCAL"] == "True"
 py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 
+if py_version in ["3.10", "3.11", "3.12"]:
+    time.sleep(300)
+
 movie_ids = {
     "3.6": {"id": 11, "name": "Star Wars"},
     "3.7": {"id": 1891, "name": "The Empire Strikes Back"},
@@ -101,7 +104,9 @@ class APITests(unittest.TestCase):
         v4_url = self.api_v4_session.v4_authenticate()
         if local:
             print(f"\n\nApprove URL: {v4_url}")
-            time.sleep(30)
+            with open("url.txt", "w") as file1:
+                file1.write(v4_url)
+            time.sleep(120)
         else:
             git = Github(gh_token)
             repo = git.get_user("meisnate12").get_repo("TMDbAPIs")
@@ -229,6 +234,7 @@ class APITests(unittest.TestCase):
             movies.get_results(-1)
         self.assertEqual(len(movies.get_results(50)), 50)
         self.assertGreater(len(movies.get_results()), 50)
+        movies.load_page(1)
         self.assertIsNotNone([m for m in movies])
         self.assertIsNotNone(movies[1])
         tv_shows = self.api.discover_tv_shows(with_companies=1)
