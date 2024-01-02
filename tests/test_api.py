@@ -1,7 +1,7 @@
 import os, sys, time, unittest
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from github import Github
+from github import Auth, Github
 from tmdbapis.api3 import API3
 from tmdbapis.exceptions import NotFound, Invalid, Authentication
 from tmdbapis.objs.reload import Movie, Person, TVShow
@@ -108,7 +108,7 @@ class APITests(unittest.TestCase):
                 file1.write(v4_url)
             time.sleep(120)
         else:
-            git = Github(gh_token)
+            git = Github(auth=Auth.Token(gh_token))
             repo = git.get_user("meisnate12").get_repo("TMDbAPIs")
             issue_id = repo.create_issue(f"Run: {datetime.now().strftime('%Y-%m-%d %H:%M')} {py_version}", body=v4_url,
                                          assignee="meisnate12", labels=["approval-needed"]).number
