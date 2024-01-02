@@ -26,12 +26,7 @@ gh_token = os.environ["PAT"]
 local = os.environ["LOCAL"] == "True"
 py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 
-if py_version in ["3.10", "3.11", "3.12"] and not local:
-    time.sleep(300)
-
 movie_ids = {
-    "3.6": {"id": 11, "name": "Star Wars"},
-    "3.7": {"id": 1891, "name": "The Empire Strikes Back"},
     "3.8": {"id": 1892, "name": "Return of the Jedi"},
     "3.9": {"id": 1893, "name": "Star Wars: Episode I - The Phantom Menace"},
     "3.10": {"id": 1894, "name": "Star Wars: Episode II - Attack of the Clones"},
@@ -40,23 +35,19 @@ movie_ids = {
 }
 
 show_ids = {
-    "3.6": {"id": 4194, "name": "Star Wars: The Clone Wars"},
-    "3.7": {"id": 105971, "name": "Star Wars: The Bad Batch"},
-    "3.8": {"id": 60554, "name": "Star Wars Rebels"},
-    "3.9": {"id": 203085, "name": "Star Wars: Tales of the Jedi"},
-    "3.10": {"id": 114478, "name": "Star Wars: Visions"},
-    "3.11": {"id": 79093, "name": "Star Wars Resistance"},
+    "3.8": {"id": 4194, "name": "Star Wars: The Clone Wars"},
+    "3.9": {"id": 105971, "name": "Star Wars: The Bad Batch"},
+    "3.10": {"id": 60554, "name": "Star Wars Rebels"},
+    "3.11": {"id": 203085, "name": "Star Wars: Tales of the Jedi"},
     "3.12": {"id": 83867, "name": "Star Wars: Andor"},
 }
 
 episode_ids = {
-    "3.6": {"id": 1, "name": "Ambush"},
-    "3.7": {"id": 2, "name": "Rising Malevolence"},
-    "3.8": {"id": 3, "name": "Shadow of Malevolence"},
-    "3.9": {"id": 4, "name": "Destroy Malevolence"},
-    "3.10": {"id": 5, "name": "Rookies"},
-    "3.11": {"id": 6, "name": "Downfall of a Droid"},
-    "3.12": {"id": 7, "name": "Duel of the Droids"},
+    "3.8": {"id": 1, "name": "Ambush"},
+    "3.9": {"id": 2, "name": "Rising Malevolence"},
+    "3.10": {"id": 3, "name": "Shadow of Malevolence"},
+    "3.11": {"id": 4, "name": "Destroy Malevolence"},
+    "3.12": {"id": 5, "name": "Rookies"},
 }
 
 class APITests(unittest.TestCase):
