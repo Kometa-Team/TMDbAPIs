@@ -26,7 +26,7 @@ gh_token = os.environ["PAT"]
 local = os.environ["LOCAL"] == "True"
 py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 
-if py_version in ["3.10", "3.11", "3.12"]:
+if py_version in ["3.10", "3.11", "3.12"] and not local:
     time.sleep(300)
 
 movie_ids = {

@@ -3,4 +3,4 @@ setuptools
 pytest
 pytest-cov
 python-dotenv
-PyGithub
+PyGithub==2.1.1
