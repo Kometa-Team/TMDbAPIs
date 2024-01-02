@@ -33,6 +33,7 @@ movie_ids = {
     "3.9": {"id": 1893, "name": "Star Wars: Episode I - The Phantom Menace"},
     "3.10": {"id": 1894, "name": "Star Wars: Episode II - Attack of the Clones"},
     "3.11": {"id": 1895, "name": "Star Wars: Episode III - Revenge of the Sith"},
+    "3.12": {"id": 140607, "name": "Star Wars: The Force Awakens"},
 }
 
 show_ids = {
@@ -42,6 +43,7 @@ show_ids = {
     "3.9": {"id": 203085, "name": "Star Wars: Tales of the Jedi"},
     "3.10": {"id": 114478, "name": "Star Wars: Visions"},
     "3.11": {"id": 79093, "name": "Star Wars Resistance"},
+    "3.12": {"id": 83867, "name": "Star Wars: Andor"},
 }
 
 episode_ids = {
@@ -51,6 +53,7 @@ episode_ids = {
     "3.9": {"id": 4, "name": "Destroy Malevolence"},
     "3.10": {"id": 5, "name": "Rookies"},
     "3.11": {"id": 6, "name": "Downfall of a Droid"},
+    "3.12": {"id": 7, "name": "Duel of the Droids"},
 }
 
 class APITests(unittest.TestCase):
