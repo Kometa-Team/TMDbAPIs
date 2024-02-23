@@ -375,11 +375,11 @@ class TMDbAPIs:
             elif k in ["primary_release_year", "first_air_date_year", "vote_count.gte", "vote_count.lte",
                        "with_runtime.gte", "with_runtime.lte"]:
                 if not isinstance(v, int) or v <= 0:
-                    raise Invalid(f"{k} must be an integer greater then 0")
+                    raise Invalid(f"{k} must be an integer greater than 0")
                 validated[k] = v
             elif k in ["vote_average.gte", "vote_average.lte"]:
                 if not isinstance(v, (int, float)) or v <= 0:
-                    raise Invalid(f"{k} must be a number greater then 0.0")
+                    raise Invalid(f"{k} must be a number greater than 0.0")
                 validated[k] = float(v)
             elif k == "with_watch_monetization_types":
                 if v not in ["flatrate", "free", "ads", "rent", "buy"]:

@@ -105,10 +105,12 @@ class TMDbPagination(TMDbObj):
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``amount`` is not greater than zero.
          """
+        if self.total_results == 0:
+            return []
         if amount is None or int(amount) > self.total_results:
             amount = self.total_results
         if amount < 1:
-            raise Invalid("amount must be greater then 0")
+            raise Invalid("amount must be greater than 0")
         results = []
         current_page = 0
         while len(results) < amount and current_page < self.total_pages:
