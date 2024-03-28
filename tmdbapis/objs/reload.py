@@ -814,6 +814,7 @@ class Season(TMDbReload):
             tvdb_id (int): TVDB ID of the Season.
             tvrage_id (int): TV Rage ID of the Season.
             videos (List[:class:`~tmdbapis.objs.simple.Video`]): List of Videos associated with the Season.
+            vote_average (float): Vote Average for the TV Season.
     """
 
     def __init__(self, tmdb, data, tv_id, load=False, partial=False):
@@ -843,10 +844,11 @@ class Season(TMDbReload):
         self.tvdb_id = self._parse(attrs=["external_ids", "tvdb_id"], value_type="int")
         self.tvrage_id = self._parse(attrs=["external_ids", "tvrage_id"], value_type="int")
         self.videos = self._parse(attrs=["videos", "results"], value_type="video", is_list=True)
+        self.vote_average = self._parse(attrs="vote_average", value_type="float")
         self._finish(self.name)
 
     def _append_str(self):
-        return "images,translations"
+        return "images,external_ids,translations,aggregate_credits,credits"
 
     def _full_load(self, partial=None):
         return self._api.tv_seasons_get_details(
