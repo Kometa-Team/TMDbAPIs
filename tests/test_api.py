@@ -100,7 +100,7 @@ class APITests(unittest.TestCase):
             time.sleep(120)
         else:
             git = Github(auth=Auth.Token(gh_token))
-            repo = git.get_user("meisnate12").get_repo("TMDbAPIs")
+            repo = git.get_user("Kometa-Team").get_repo("TMDbAPIs")
             issue_id = repo.create_issue(f"Run: {datetime.now().strftime('%Y-%m-%d %H:%M')} {py_version}", body=v4_url,
                                          assignee="meisnate12", labels=["approval-needed"]).number
             while True:

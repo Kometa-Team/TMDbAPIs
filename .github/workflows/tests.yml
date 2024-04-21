@@ -10,6 +10,7 @@ jobs:
   run-tests:
     runs-on: ubuntu-20.04
     strategy:
+      max-parallel: 1
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
@@ -47,9 +48,14 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
 
+  failure-notification:
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    needs: [run-tests]
+    steps:
+
       - name: Discord Failure Notification
         uses: Kometa-Team/discord-notifications@master
-        if: failure()
         with:
           webhook_id: ${{ secrets.BUILD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.BUILD_WEBHOOK_TOKEN }}
@@ -61,19 +67,3 @@ jobs:
           avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/logo.png
           author: GitHub
           author_icon_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/git.png
-
-  tag-new-versions:
-    runs-on: ubuntu-latest
-    if: ${{ success() }}
-    needs: [run-tests]
-    steps:
-
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PAT }}
-          fetch-depth: 2
-
-      - uses: salsify/action-detect-and-tag-new-version@v1.0.3
-        with:
-          version-command: |
-            cat VERSION
