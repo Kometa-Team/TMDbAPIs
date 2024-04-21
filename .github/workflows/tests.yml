@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  run-tests:
+  run:
     runs-on: ubuntu-20.04
     strategy:
       max-parallel: 1
@@ -30,7 +30,7 @@ jobs:
           pip install -r requirements-dev.txt
           python setup.py install
 
-      - name: Run tests
+      - name: Run Tests
         env:
           TMDB_APIKEY: ${{ secrets.TMDB_APIKEY }}
           TMDB_SESSION: ${{ secrets.TMDB_SESSION }}
