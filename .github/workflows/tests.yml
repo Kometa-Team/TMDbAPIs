@@ -51,7 +51,7 @@ jobs:
   failure-notification:
     runs-on: ubuntu-latest
     if: ${{ failure() }}
-    needs: [run-tests]
+    needs: [run]
     steps:
 
       - name: Discord Failure Notification
