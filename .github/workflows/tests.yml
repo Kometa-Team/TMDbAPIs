@@ -47,6 +47,21 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
 
+      - name: Discord Failure Notification
+        uses: Kometa-Team/discord-notifications@master
+        if: failure()
+        with:
+          webhook_id: ${{ secrets.BUILD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.BUILD_WEBHOOK_TOKEN }}
+          message: <@&1079153184007790652>
+          title: "${{ secrets.REPO_NAME }}: **Tests Failed**"
+          color: 14879811
+          url: https://github.com/Kometa-Team/${{ secrets.REPO_NAME }}/actions/runs/${{ github.run_id }}
+          username: Kobota
+          avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/logo.png
+          author: GitHub
+          author_icon_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/git.png
+
   tag-new-versions:
     runs-on: ubuntu-latest
     if: ${{ success() }}

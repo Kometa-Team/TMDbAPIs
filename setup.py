@@ -30,10 +30,10 @@ setup(
       "requests"
     ],
     project_urls={
-      "Documentation": "https://tmdbapis.metamanager.wiki",
+      "Documentation": "https://tmdbapis.kometa.wiki",
       "Funding": "https://github.com/sponsors/meisnate12",
-      "Source": "https://github.com/meisnate12/TMDbAPIs",
-      "Issues": "https://github.com/meisnate12/TMDbAPIs/issues",
+      "Source": "https://github.com/Kometa-Team/TMDbAPIs",
+      "Issues": "https://github.com/Kometa-Team/TMDbAPIs/issues",
     },
     classifiers=[
       "Development Status :: 5 - Production/Stable",

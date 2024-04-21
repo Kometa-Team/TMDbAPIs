@@ -1,20 +1,20 @@
 Welcome to TMDbAPIs Documentation!
 ==========================================================
 
-.. image:: https://img.shields.io/github/v/release/meisnate12/TMDbAPIs?style=plastic
-    :target: https://github.com/meisnate12/TMDbAPIs/releases
+.. image:: https://img.shields.io/github/v/release/Kometa-Team/TMDbAPIs?style=plastic
+    :target: https://github.com/Kometa-Team/TMDbAPIs/releases
     :alt: GitHub release (latest by date)
 
-.. image:: https://img.shields.io/github/actions/workflow/status/meisnate12/TMDbAPIs/tests.yml?branch=master&style=plastic
-    :target: https://github.com/meisnate12/TMDbAPIs/actions/workflows/tests.yml
+.. image:: https://img.shields.io/github/actions/workflow/status/Kometa-Team/TMDbAPIs/tests.yml?branch=master&style=plastic
+    :target: https://github.com/Kometa-Team/TMDbAPIs/actions/workflows/tests.yml
     :alt: Build Testing
 
-.. image:: https://img.shields.io/codecov/c/github/meisnate12/TMDbAPIs?color=greenred&style=plastic
-    :target: https://codecov.io/gh/meisnate12/TMDbAPIs
+.. image:: https://img.shields.io/codecov/c/github/Kometa-Team/TMDbAPIs?color=greenred&style=plastic
+    :target: https://codecov.io/gh/Kometa-Team/TMDbAPIs
     :alt: Build Coverage
 
-.. image:: https://img.shields.io/github/commits-since/meisnate12/TMDbAPIs/latest?style=plastic
-    :target: https://github.com/meisnate12/TMDbAPIs/commits/master
+.. image:: https://img.shields.io/github/commits-since/Kometa-Team/TMDbAPIs/latest?style=plastic
+    :target: https://github.com/Kometa-Team/TMDbAPIs/commits/master
     :alt: GitHub commits since latest release (by date) for a branch
 
 .. image:: https://img.shields.io/pypi/v/TMDbAPIs?style=plastic
@@ -27,16 +27,16 @@ Welcome to TMDbAPIs Documentation!
 
 |
 
-.. image:: https://img.shields.io/readthedocs/plex-meta-manager?color=%2300bc8c&style=plastic
-    :target: https://tmdbapis.metamanager.wiki/en/latest/
+.. image:: https://img.shields.io/readthedocs/tmdbapis?color=%2300bc8c&style=plastic
+    :target: https://tmdbapis.kometa.wiki/en/latest/
     :alt: Wiki
 
 .. image:: https://img.shields.io/discord/822460010649878528?color=%2300bc8c&label=Discord&style=plastic
-    :target: https://discord.gg/NfH6mGFuAB
+    :target: https://kometa.wiki/en/latest/discord/
     :alt: Discord
 
-.. image:: https://img.shields.io/reddit/subreddit-subscribers/PlexMetaManager?color=%2300bc8c&label=r%2FPlexMetaManager&style=plastic
-    :target: https://www.reddit.com/r/PlexMetaManager/
+.. image:: https://img.shields.io/reddit/subreddit-subscribers/Kometa?color=%2300bc8c&label=r%2FKometa&style=plastic
+    :target: https://www.reddit.com/r/Kometa/
     :alt: Reddit
 
 .. image:: https://img.shields.io/github/sponsors/meisnate12?color=%238a2be2&style=plastic
@@ -44,7 +44,7 @@ Welcome to TMDbAPIs Documentation!
     :alt: GitHub Sponsors
 
 .. image:: https://img.shields.io/badge/-Sponsor_or_Donate-blueviolet?style=plastic
-    :target: https://github.com/sponsors/meisnate12
+    :target: https://github.com/sponsors/Kometa-Team
     :alt: Sponsor or Donate
 
 
@@ -62,7 +62,7 @@ Installation & Documentation
 
 Documentation_ can be found at Read the Docs.
 
-.. _Documentation: https://tmdbapis.metamanager.wiki
+.. _Documentation: https://tmdbapis.kometa.wiki
 
 
 Using the Object API
@@ -86,7 +86,7 @@ To create a TMDbAPIs Object you need your V3 API Key, which can be found followi
 Authenticating V3 API Token
 ----------------------------------------------------------
 
-To authenticate your TMDb V3 API Token you can either authenticate your TMDb V4 Token or use the `authenticate() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.authenticate>`_ method.
+To authenticate your TMDb V3 API Token you can either authenticate your TMDb V4 Token or use the `authenticate() <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.authenticate>`_ method.
 
 .. code-block:: python
 
@@ -114,7 +114,7 @@ To save your authenticated session use the ``session_id`` Attribute.
     with open("session_id.txt", "w") as text_file:
         print(tmdb.session_id, file=text_file)
 
-To load the authenticated session use the ``session_id`` Parameter of the `TMDbAPIs <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor.
+To load the authenticated session use the ``session_id`` Parameter of the `TMDbAPIs <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor.
 
 .. code-block:: python
 
@@ -132,7 +132,7 @@ To load the authenticated session use the ``session_id`` Parameter of the `TMDbA
 Adding TMDb V4 API Read Access Token
 ----------------------------------------------------------
 
-To gain read access to TMDb V4's API just provide you're TMDb V4 Access Token either using the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or by using the `v4_access_token() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
+To gain read access to TMDb V4's API just provide you're TMDb V4 Access Token either using the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or by using the `v4_access_token() <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
 
 To gain read access to TMDb V4's API need your TMDb V4 Access Token, which can be found following `this guide <https://developers.themoviedb.org/3/getting-started/introduction>`_.
 
@@ -152,8 +152,8 @@ Authenticating TMDb V4 API Token
 To authenticate your TMDB V4 Read Access Token it is a multi step process.
 
 1. Add your TMDb V4 API Read Access Token.
-2. Authenticate the URL returned from `v4_authenticate() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_authenticate>`_.
-3. Once the URL has been authenticated you must approve it by running `v4_approved() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_approved>`_.
+2. Authenticate the URL returned from `v4_authenticate() <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_authenticate>`_.
+3. Once the URL has been authenticated you must approve it by running `v4_approved() <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_approved>`_.
 
 .. code-block:: python
 
@@ -189,7 +189,7 @@ To save your authenticated token use the ``v4_access_token`` Attribute.
     with open("access_token.txt", "w") as text_file:
         print(tmdb.v4_access_token, file=text_file)
 
-To load the authenticated token use the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or the `v4_access_token() <https://tmdbapis.metamanager.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
+To load the authenticated token use the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or the `v4_access_token() <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
 
 .. code-block:: python
 
@@ -212,6 +212,6 @@ Hyperlinks
 
 Usage & Contributions
 ----------------------------------------------------------
-* Source is available on the `Github Project Page <https://github.com/meisnate12/tmdbapis>`_.
+* Source is available on the `Github Project Page <https://github.com/Kometa-Team/TMDbAPIs>`_.
 * Contributors to TMDbAPIs own their own contributions and may distribute that code under
-  the `MIT license <https://github.com/meisnate12/tmdbapis/blob/master/LICENSE.txt>`_.
+  the `MIT license <https://github.com/Kometa-Team/TMDbAPIs/blob/master/LICENSE.txt>`_.

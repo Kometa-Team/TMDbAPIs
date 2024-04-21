@@ -18,8 +18,8 @@ __credits__ = "meisnate12"
 __package_name__ = "tmdbapis"
 __project_name__ = "TMDbAPIs"
 __description__ = "A lightweight Python library for The V3 and V4 TMDb APIs."
-__url__ = "https://github.com/meisnate12/TMDbAPIs"
-__email__ = "meisnate12@gmail.com"
+__url__ = "https://github.com/Kometa-Team/TMDbAPIs"
+__email__ = "kometateam@proton.me"
 __license__ = "MIT License"
 __all__ = [
     "TMDbAPIs",
