@@ -21,28 +21,34 @@ from tmdbapis.objs.simple import Country, CountryCertifications, Genre, WatchPro
 logger = logging.getLogger(__name__)
 
 discover_movie_options = [
-    "region", "sort_by", "certification_country", "certification", "certification.lte", "certification.gte",
+    "region", "sort_by", "certification", "certification.lte", "certification.gte", "certification_country",
     "include_adult", "include_video", "primary_release_year", "primary_release_date.gte", "primary_release_date.lte",
-    "release_date.gte", "release_date.lte", "with_release_type", "year", "vote_count.gte", "vote_count.lte",
-    "vote_average.gte", "vote_average.lte", "with_cast", "with_crew", "with_people", "with_companies", "with_genres",
-    "without_genres", "with_keywords", "without_keywords", "with_runtime.gte", "with_runtime.lte",
-    "with_original_language", "with_watch_providers", "watch_region", "with_watch_monetization_types",
-    "without_companies", "with_title_translation", "with_overview_translation"
+    "release_date.gte", "release_date.lte", "vote_average.gte", "vote_average.lte", "vote_count.gte", "vote_count.lte",
+    "watch_region", "with_cast", "with_companies", "with_crew", "with_genres", "with_keywords",
+    "with_origin_country", "with_original_language", "with_people", "with_release_type", "with_runtime.gte", "with_runtime.lte",
+    "with_watch_monetization_types", "with_watch_providers", "without_companies", "without_genres", "without_keywords",
+    "without_watch_providers", "year", "with_title_translation", "with_overview_translation"
 ]
 discover_movie_sort_options = [
-    "popularity.asc", "popularity.desc", "release_date.asc", "release_date.desc", "revenue.asc", "revenue.desc",
-    "primary_release_date.asc", "primary_release_date.desc", "original_title.asc", "original_title.desc",
+    "popularity.asc", "popularity.desc", "revenue.asc", "revenue.desc",
+    "release_date.asc", "release_date.desc", "primary_release_date.asc", "primary_release_date.desc",
+    "title.asc", "title.desc", "original_title.asc", "original_title.desc",
     "vote_average.asc", "vote_average.desc", "vote_count.asc", "vote_count.desc"
 ]
 discover_tv_options = [
-    "sort_by", "air_date.gte", "air_date.lte", "first_air_date.gte", "first_air_date.lte", "first_air_date_year",
-    "timezone", "vote_average.gte", "vote_average.lte", "vote_count.gte", "vote_count.lte", "with_genres",
-    "with_networks", "without_genres", "with_runtime.gte", "with_runtime.lte", "include_null_first_air_dates",
-    "with_original_language", "without_keywords", "screened_theatrically", "with_companies", "with_keywords",
-    "with_watch_providers", "watch_region", "with_watch_monetization_types", "with_status", "with_type",
-    "without_companies", "with_name_translation", "with_overview_translation"
+    "sort_by", "air_date.gte", "air_date.lte", "first_air_date_year", "first_air_date.gte", "first_air_date.lte",
+    "include_adult", "include_null_first_air_dates", "screened_theatrically", "timezone",
+    "vote_average.gte", "vote_average.lte", "vote_count.gte", "vote_count.lte", "watch_region",
+    "with_companies", "with_genres", "with_keywords", "with_networks"
+    "with_runtime.gte", "with_runtime.lte", "with_status", "with_watch_monetization_types", "with_watch_providers",
+    "without_companies", "without_genres", "without_keywords", "without_watch_providers", "with_type",
+    "with_name_translation", "with_overview_translation"
 ]
-discover_tv_sort_options = ["popularity.asc", "popularity.desc", "first_air_date.desc", "first_air_date.asc", "vote_average.asc", "vote_average.desc"]
+discover_tv_sort_options = [
+    "popularity.asc", "popularity.desc", "first_air_date.desc", "first_air_date.asc",
+    "name.asc", "name.desc", "original_name.asc", "original_name.desc",
+    "vote_average.asc", "vote_average.desc", "vote_count.asc", "vote_count.desc"
+]
 
 
 class TMDbAPIs:
@@ -953,7 +959,7 @@ class TMDbAPIs:
             Parameters:
                 language (Optional[str]): ISO-639-1 or ISO-3166-1 value to display translated data for the fields that support it.
                 region (Optional[str]): ISO-3166-1 code to filter release dates. Must be uppercase.
-                sort_by (Optional[str]): Allowed Values: ``popularity.asc``, ``popularity.desc``, ``release_date.asc``, ``release_date.desc``, ``revenue.asc``, ``revenue.desc``, ``primary_release_date.asc``, ``primary_release_date.desc``, ``original_title.asc``, ``original_title.desc``, ``vote_average.asc``, ``vote_average.desc``, ``vote_count.asc``, ``vote_count.desc``
+                sort_by (Optional[str]): Allowed Values: ``popularity.asc``, ``popularity.desc``, ``release_date.asc``, ``release_date.desc``, ``revenue.asc``, ``revenue.desc``, ``primary_release_date.asc``, ``primary_release_date.desc``, ``title.asc``, ``title.desc``, ``original_title.asc``, ``original_title.desc``, ``vote_average.asc``, ``vote_average.desc``, ``vote_count.asc``, ``vote_count.desc``
                 certification_country (Optional[str]): Used in conjunction with the ``certification`` filter, use this to specify a country with a valid certification.
                 certification (Optional[str]): Filter results with a valid certification from the ``certification_country`` field.
                 certification.lte (Optional[str]): Filter and only include movies that have a certification that is less than or equal to the specified value.
@@ -976,17 +982,20 @@ class TMDbAPIs:
                 with_crew (Optional[str]): A comma separated list of person ID's. Only include movies that have one of the ID's added as a crew member.
                 with_people (Optional[str]): A comma separated list of person ID's. Only include movies that have one of the ID's added as a either a actor or a crew member.
                 with_companies (Optional[str]): A comma separated list of production company ID's. Only include movies that have one of the ID's added as a production company.
+                without_companies (Optional[str]): A comma separated list of production company ID's. Exclude movies that have one of the ID's added as a production company.
                 with_genres (Optional[str]): Comma separated value of genre ids that you want to include in the results.
                 without_genres (Optional[str]): Comma separated value of genre ids that you want to exclude from the results.
                 with_keywords (Optional[str]): A comma separated list of keyword ID's. Only includes movies that have one of the ID's added as a keyword.
                 without_keywords (Optional[str]): Exclude items with certain keywords. You can comma and pipe separate these values to create an 'AND' or 'OR' logic.
                 with_runtime.gte (Optional[int]): Filter and only include movies that have a runtime that is greater or equal to a value.
                 with_runtime.lte (Optional[int]): Filter and only include movies that have a runtime that is less than or equal to a value.
+                with_origin_country (Optional[str]): Filter and only include movies that have the given origin country.
                 with_original_language (Optional[str]): Specify an ISO 639-1 string to filter results by their original language value.
                 with_title_translation (Optional[str]): Specify a Primary Translation string to filter results by their title translation value.
                 with_overview_translation (Optional[str]): Specify a Primary Translation string to filter results by their overview translation value.
                 with_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
-                watch_region (Optional[str]): An ISO 3166-1 code. Combine this filter with ``with_watch_providers`` in order to filter your results by a specific watch provider in a specific region.
+                without_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
+                watch_region (Optional[str]): An ISO 3166-1 code. Combine this filter with ``with_watch_providers`` and ``with_watch_monetization_types`` in order to filter your results by a specific watch provider in a specific region.
                 with_watch_monetization_types (Optional[str]): In combination with ``watch_region``, you can filter by monetization type. Allowed Values: ``flatrate``, ``free``, ``ads``, ``rent``, ``buy``
 
             Returns:
@@ -1011,12 +1020,13 @@ class TMDbAPIs:
 
             Parameters:
                 language (Optional[str]): ISO-639-1 or ISO-3166-1 value to display translated data for the fields that support it.
-                sort_by (Optional[str]): Allowed Values: ``vote_average.desc``, ``vote_average.asc``, ``first_air_date.desc``, ``first_air_date.asc``, ``popularity.desc``, ``popularity.asc``
-                air_date.gte (Optional[str]): Filter and only include TV shows that have a air date (by looking at all episodes) that is greater or equal to the specified value. Format: YYYY-MM-DD
-                air_date.lte (Optional[str]): Filter and only include TV shows that have a air date (by looking at all episodes) that is less than or equal to the specified value. Format: YYYY-MM-DD
-                first_air_date.gte (Optional[str]): Filter and only include TV shows that have a original air date that is greater or equal to the specified value. Can be used in conjunction with the ``include_null_first_air_dates`` filter if you want to include items with no air date. Format: YYYY-MM-DD
-                first_air_date.lte (Optional[str]): Filter and only include TV shows that have a original air date that is less than or equal to the specified value. Can be used in conjunction with the ``include_null_first_air_dates`` filter if you want to include items with no air date. Format: YYYY-MM-DD
-                first_air_date_year (Optional[int]): Filter and only include TV shows that have a original air date year that equal to the specified value. Can be used in conjunction with the ``include_null_first_air_dates`` filter if you want to include items with no air date.
+                sort_by (Optional[str]): Allowed Values: ``popularity.desc``, ``popularity.asc``, ``first_air_date.desc``, ``first_air_date.asc``, ``name.asc``, ``name.desc``, ``original_name.asc``, ``original_name.desc``, ``vote_average.desc``, ``vote_average.asc``, ``vote_count.desc``, ``vote_count.asc``
+                air_date.gte (Optional[str]): Filter and only include TV shows that have an air date (by looking at all episodes) that is greater or equal to the specified value. Format: YYYY-MM-DD
+                air_date.lte (Optional[str]): Filter and only include TV shows that have an air date (by looking at all episodes) that is less than or equal to the specified value. Format: YYYY-MM-DD
+                first_air_date.gte (Optional[str]): Filter and only include TV shows that have an original air date that is greater or equal to the specified value. Can be used in conjunction with the ``include_null_first_air_dates`` filter if you want to include items with no air date. Format: YYYY-MM-DD
+                first_air_date.lte (Optional[str]): Filter and only include TV shows that have an original air date that is less than or equal to the specified value. Can be used in conjunction with the ``include_null_first_air_dates`` filter if you want to include items with no air date. Format: YYYY-MM-DD
+                first_air_date_year (Optional[int]): Filter and only include TV shows that have an original air date year that equal to the specified value. Can be used in conjunction with the ``include_null_first_air_dates`` filter if you want to include items with no air date.
+                include_adult (Optional[bool]): A filter and include or exclude adult shows.
                 page (Optional[int]): Specify the page of results to query.
                 timezone (Optional[str]): Used in conjunction with the ``air_date.gte``/``air_date.lte`` filter to calculate the proper UTC offset.
                 vote_average.gte (Optional[float]): Filter and only include TV shows that have a rating that is greater or equal to the specified value.
@@ -1028,15 +1038,19 @@ class TMDbAPIs:
                 without_genres (Optional[str]): Comma separated value of genre ids that you want to exclude from the results.
                 with_runtime.gte (Optional[int]): Filter and only include TV shows with an episode runtime that is greater than or equal to a value.
                 with_runtime.lte (Optional[int]): Filter and only include TV shows with an episode runtime that is less than or equal to a value.
+                with_status (Optional[str]): Filter and only include TV shows that have the given status values. Allowed Values: ``0``, ``1``, ``2``, ``3``, ``4``, ``5``
+                with_type (Optional[str]): Filter and only include TV shows that have the given type values. Allowed Values: ``0``, ``1``, ``2``, ``3``, ``4``, ``5``, ``6``
                 include_null_first_air_dates (Optional[bool]): Use this filter to include TV shows that don't have an air date while using any of the ``first_air_date`` filters.
                 with_original_language (Optional[str]): Specify an ISO 639-1 string to filter results by their original language value.
                 without_keywords (Optional[str]): Exclude items with certain keywords. You can comma and pipe separate these values to create an 'AND' or 'OR' logic.
                 screened_theatrically (Optional[bool]): Filter results to include items that have been screened theatrically.
                 with_companies (Optional[str]): A comma separated list of production company ID's. Only include movies that have one of the ID's added as a production company.
+                without_companies (Optional[str]): A comma separated list of production company ID's. Only include movies that have one of the ID's added as a production company.
                 with_keywords (Optional[str]): A comma separated list of keyword ID's. Only includes TV shows that have one of the ID's added as a keyword.
                 with_name_translation (Optional[str]): Specify a Primary Translation string to filter results by their name translation value.
                 with_overview_translation (Optional[str]): Specify a Primary Translation string to filter results by their overview translation value.
                 with_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
+                without_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
                 watch_region (Optional[str]): An ISO 3166-1 code. Combine this filter with ``with_watch_providers`` in order to filter your results by a specific watch provider in a specific region.
                 with_watch_monetization_types (Optional[str]): In combination with ``watch_region``, you can filter by monetization type. Allowed Values: ``flatrate``, ``free``, ``ads``, ``rent``, ``buy``
 

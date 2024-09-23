@@ -204,13 +204,13 @@ class Company(TMDbReload):
     @property
     def movies(self):
         if not self._movies:
-            self._movies = self._tmdb.discover_movies(with_companies=self.id)
+            self._movies = self._tmdb.discover_movies(with_companies=self.id, sort_by="title.asc")
         return self._movies
 
     @property
     def tv_shows(self):
         if not self._tv_shows:
-            self._tv_shows = self._tmdb.discover_tv_shows(with_companies=self.id)
+            self._tv_shows = self._tmdb.discover_tv_shows(with_companies=self.id, sort_by="name.asc")
         return self._tv_shows
 
 
@@ -478,13 +478,13 @@ class Keyword(TMDbReload):
     @property
     def movies(self):
         if not self._movies:
-            self._movies = self._tmdb.discover_movies(with_keywords=self.id)
+            self._movies = self._tmdb.discover_movies(with_keywords=self.id, sort_by="title.asc")
         return self._movies
 
     @property
     def tv_shows(self):
         if not self._tv_shows:
-            self._tv_shows = self._tmdb.discover_tv_shows(with_keywords=self.id)
+            self._tv_shows = self._tmdb.discover_tv_shows(with_keywords=self.id, sort_by="name.asc")
         return self._tv_shows
 
 
@@ -668,7 +668,7 @@ class Network(TMDbReload):
     @property
     def tv_shows(self):
         if not self._tv_shows:
-            self._tv_shows = self._tmdb.discover_tv_shows(with_networks=self.id)
+            self._tv_shows = self._tmdb.discover_tv_shows(with_networks=self.id, sort_by="name.asc")
         return self._tv_shows
 
 
