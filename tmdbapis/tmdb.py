@@ -41,8 +41,7 @@ discover_tv_options = [
     "vote_average.gte", "vote_average.lte", "vote_count.gte", "vote_count.lte", "watch_region",
     "with_companies", "with_genres", "with_keywords", "with_networks",
     "with_runtime.gte", "with_runtime.lte", "with_status", "with_watch_monetization_types", "with_watch_providers",
-    "without_companies", "without_genres", "without_keywords", "without_watch_providers", "with_type",
-    "with_name_translation", "with_overview_translation"
+    "without_companies", "without_genres", "without_keywords", "without_watch_providers", "with_type"
 ]
 discover_tv_sort_options = [
     "popularity.asc", "popularity.desc", "first_air_date.desc", "first_air_date.asc",
@@ -1047,8 +1046,6 @@ class TMDbAPIs:
                 with_companies (Optional[str]): A comma separated list of production company ID's. Only include movies that have one of the ID's added as a production company.
                 without_companies (Optional[str]): A comma separated list of production company ID's. Only include movies that have one of the ID's added as a production company.
                 with_keywords (Optional[str]): A comma separated list of keyword ID's. Only includes TV shows that have one of the ID's added as a keyword.
-                with_name_translation (Optional[str]): Specify a Primary Translation string to filter results by their name translation value.
-                with_overview_translation (Optional[str]): Specify a Primary Translation string to filter results by their overview translation value.
                 with_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
                 without_watch_providers (Optional[str]): A comma or pipe separated list of watch provider ID's. Combine this filter with ``watch_region`` in order to filter your results by a specific watch provider in a specific region.
                 watch_region (Optional[str]): An ISO 3166-1 code. Combine this filter with ``with_watch_providers`` in order to filter your results by a specific watch provider in a specific region.
