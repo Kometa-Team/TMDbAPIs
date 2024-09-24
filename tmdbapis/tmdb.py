@@ -39,7 +39,7 @@ discover_tv_options = [
     "sort_by", "air_date.gte", "air_date.lte", "first_air_date_year", "first_air_date.gte", "first_air_date.lte",
     "include_adult", "include_null_first_air_dates", "screened_theatrically", "timezone",
     "vote_average.gte", "vote_average.lte", "vote_count.gte", "vote_count.lte", "watch_region",
-    "with_companies", "with_genres", "with_keywords", "with_networks"
+    "with_companies", "with_genres", "with_keywords", "with_networks",
     "with_runtime.gte", "with_runtime.lte", "with_status", "with_watch_monetization_types", "with_watch_providers",
     "without_companies", "without_genres", "without_keywords", "without_watch_providers", "with_type",
     "with_name_translation", "with_overview_translation"
