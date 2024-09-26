@@ -113,7 +113,7 @@ class TMDbPagination(TMDbObj):
             raise Invalid("amount must be greater than 0")
         results = []
         current_page = 0
-        while len(results) < amount and current_page < self.total_pages:
+        while len(results) < amount and current_page < self.total_pages and current_page < 500:
             current_page += 1
             self.load_page(current_page)
             if len(results) + len(self.results) < amount:
