@@ -388,8 +388,6 @@ class TMDbAPIs:
                     raise Invalid(f"{k} must be a number greater than 0.0")
                 validated[k] = float(v)
             elif k == "with_watch_monetization_types":
-                if v not in ["flatrate", "free", "ads", "rent", "buy"]:
-                    raise Invalid(f"{v} is not a valid with_watch_monetization_types option. Options: [flatrate, free, ads, rent, or buy]")
                 if "watch_region" not in kwargs:
                     raise Invalid("with_watch_monetization_types must be used with watch_region")
                 validated[k] = v

@@ -59,7 +59,7 @@ class TMDbPagination(TMDbObj):
             Raises:
                 :class:`~tmdbapis.exceptions.Invalid`: When ``start_date`` or ``end_date`` is in an incorrect format.
         """
-        if self.page + 1 > self.total_pages:
+        if self.page + 1 > self.total_pages or self.page + 1 > 500:
             raise NotFound("No Next Page")
         self.load_page(self.page + 1)
 
@@ -73,8 +73,8 @@ class TMDbPagination(TMDbObj):
                 :class:`~tmdbapis.exceptions.Invalid`: When ``page`` is not in the range of valid page numbers.
         """
         page = int(page)
-        if page < 1 or page > self.total_pages:
-            raise Invalid(f"Page must be an integer 1-{self.total_pages}")
+        if page < 1 or page > self.total_pages or page > 500:
+            raise Invalid(f"Page must be an integer 1-{'500' if self.total_pages > 500 else self.total_pages}")
         if page in self._page_storage:
             self._loading = True
             self.results = self._page_storage[page]
