@@ -186,6 +186,8 @@ class TMDbAPIs:
         elif value_type == "date":
             if not value:
                 return None
+            elif " UT" in value:
+                return datetime.strptime(value[:-1].split(".")[0], "%Y-%m-%d %H:%M:%S UT")
             elif "T" in value:
                 return datetime.strptime(value[:-1].split(".")[0], "%Y-%m-%dT%H:%M:%S")
             else:
