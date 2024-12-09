@@ -43,7 +43,7 @@ jobs:
         run: coverage run -m pytest -s --cov tmdbapis --cov-report xml tests/test*
 
       - name: Codecov coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
