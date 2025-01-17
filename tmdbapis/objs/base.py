@@ -26,7 +26,7 @@ class TMDbObj(ABC):
         self.id = None
 
     def _finish(self, name):
-        self._name = name
+        self._name = str(name)
         self._loading = False
 
     def _image_url(self, image_path):
