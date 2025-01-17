@@ -1,6 +1,8 @@
 from tmdbapis.exceptions import NotFound
 from tmdbapis.objs.base import TMDbObj
 
+release_types = {1: "Premiere", 2: "Theatrical (limited)", 3: "Theatrical", 4: "Digital", 5: "Physical", 6: "TV"}
+
 
 class AlternativeName(TMDbObj):
     """ Represents a single Alternative Name.
@@ -244,6 +246,7 @@ class ReleaseDate(TMDbObj):
         self.note = self._parse(attrs="note")
         self.release_date = self._parse(attrs="release_date", value_type="date")
         self.type = self._parse(attrs="type", value_type="int")
+        self.type_str = release_types[self.type] if self.type in release_types else None
         self._finish(self.release_date)
 
 
