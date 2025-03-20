@@ -515,6 +515,7 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
             lists (:class:`~tmdbapis.objs.pagination.MovieLists`): Pagination Object of Lists containing the Movie.
             logos (List[:class:`~tmdbapis.objs.image.Logo`]): List of other Logos for the Movie.
             name (str): alias of title.
+            origin_countries (List[:class:`~tmdbapis.objs.simple.Country`]): Origin Countries of the Movie.
             original_language (:class:`~tmdbapis.objs.simple.Language`): Original Language of the Movie.
             original_title (str): Movie's Original Title.
             overview (str): Movie Overview.
@@ -570,6 +571,7 @@ class Movie(TMDbReload, Favorite, Rate, Watchlist):
         self.spoken_languages = self._parse(attrs="spoken_languages", value_type="language", is_list=True)
         self.lists = self._parse(attrs="lists", value_type="lists", key=self.id)
         self.logos = self._parse(attrs=["images", "logos"], value_type="logo", is_list=True)
+        self.origin_countries = self._parse(attrs="origin_country", value_type="country", is_list=True)
         self.original_language = self._parse(attrs="original_language", value_type="language")
         self.original_title = self._parse(attrs="original_title")
         self.overview = self._parse(attrs="overview")
