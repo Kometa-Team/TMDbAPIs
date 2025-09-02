@@ -11,7 +11,7 @@ from tmdbapis.exceptions import TMDbException, Invalid, NotFound, Unauthorized, 
 
 try:
     __version__ = version("tmdbapis")
-except importlib.metadata.PackageNotFoundError:
+except version.PackageNotFoundError:
     __version__ = ""
 __author__ = "Nathan Taggart"
 __credits__ = "meisnate12"
