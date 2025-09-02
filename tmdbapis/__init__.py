@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib.metadata import version
 
 from tmdbapis.tmdb import TMDbAPIs
 from tmdbapis.objs.simple import AlternativeName, AlternativeTitle, Certification, Country, CountryCertifications, \
@@ -10,8 +10,8 @@ from tmdbapis.objs.reload import TMDbReload, Account, Collection, Company, Confi
 from tmdbapis.exceptions import TMDbException, Invalid, NotFound, Unauthorized, Authentication
 
 try:
-    __version__ = pkg_resources.get_distribution("tmdbapis").version
-except pkg_resources.DistributionNotFound:
+    __version__ = version("tmdbapis")
+except importlib.metadata.PackageNotFoundError:
     __version__ = ""
 __author__ = "Nathan Taggart"
 __credits__ = "meisnate12"
