@@ -1,4 +1,4 @@
-from importlib.metadata import version
+from importlib.metadata import version, PackageNotFoundError
 
 from tmdbapis.tmdb import TMDbAPIs
 from tmdbapis.objs.simple import AlternativeName, AlternativeTitle, Certification, Country, CountryCertifications, \
@@ -11,7 +11,7 @@ from tmdbapis.exceptions import TMDbException, Invalid, NotFound, Unauthorized, 
 
 try:
     __version__ = version("tmdbapis")
-except version.PackageNotFoundError:
+except PackageNotFoundError:
     __version__ = ""
 __author__ = "Nathan Taggart"
 __credits__ = "meisnate12"
