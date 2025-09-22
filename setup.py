@@ -27,7 +27,8 @@ setup(
     python_requires=">=3.8",
     keywords=["tmdbapis", "tmdbapi", "tmdb", "wrapper", "api"],
     install_requires=[
-      "requests"
+      "requests",
+      "setuptools"
     ],
     project_urls={
       "Documentation": "https://tmdbapis.kometa.wiki",
