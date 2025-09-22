@@ -319,7 +319,7 @@ class Credit(TMDbReload):
         self.order = self._parse(attrs="order", value_type="int")
         self.original_name = self._parse(attrs="original_name")
         self.person_id = self._parse(attrs=dict_check("person", "id"), value_type="int")
-        self.popularity = self._parse(attrs=dict_check("person", "popularity"), value_type="int")
+        self.popularity = self._parse(attrs=dict_check("person", "popularity"), value_type="float")
         self.profile_path = self._parse(attrs=dict_check("person", "profile_path"))
         self.profile_url = self._image_url(self.profile_path)
         if "media" in self._data:
