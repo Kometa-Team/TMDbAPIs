@@ -186,12 +186,19 @@ class TMDbAPIs:
         elif value_type == "date":
             if not value:
                 return None
-            elif " UT" in value:
-                return datetime.strptime(value[:-1].split(".")[0], "%Y-%m-%d %H:%M:%S UT")
-            elif "T" in value:
-                return datetime.strptime(value[:-1].split(".")[0], "%Y-%m-%dT%H:%M:%S")
-            else:
-                return datetime.strptime(value, "%Y-%m-%d")
+            # Strip trailing timezone suffixes (Z, UT, UTC) and fractional seconds
+            clean = value.strip()
+            for suffix in (" UTC", " UT"):
+                if clean.endswith(suffix):
+                    clean = clean[:-len(suffix)].strip()
+                    break
+            clean = clean.rstrip("Z").split(".")[0]
+            for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+                try:
+                    return datetime.strptime(clean, fmt)
+                except ValueError:
+                    continue
+            return None
         elif value_type == "dict":
             return value
         elif value_type == "alternative_name":
