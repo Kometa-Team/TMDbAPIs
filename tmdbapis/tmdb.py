@@ -1113,7 +1113,7 @@ class TMDbAPIs:
                 List[:class:`~tmdbapis.objs.simple.Genre`]
         """
         if reload or self._movie_genres is None:
-            self._movie_genres = self._parse(data=self._api.genres_get_movie_list(),
+            self._movie_genres = self._parse(data=self._api.genres_get_movie_list(language=self.language),
                                              attrs="genres", value_type="load_genre", is_list=True)
         return self._movie_genres
 
@@ -1127,7 +1127,7 @@ class TMDbAPIs:
                 List[:class:`~tmdbapis.objs.simple.Genre`]
         """
         if reload or self._tv_genres is None:
-            self._tv_genres = self._parse(data=self._api.genres_get_tv_list(),
+            self._tv_genres = self._parse(data=self._api.genres_get_tv_list(language=self.language),
                                           attrs="genres", value_type="load_genre", is_list=True)
         return self._tv_genres
 
