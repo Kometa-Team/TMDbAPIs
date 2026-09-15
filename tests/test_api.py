@@ -17,7 +17,6 @@ logger.addHandler(logging.StreamHandler())
 load_dotenv()
 
 apikey = os.environ["TMDB_APIKEY"]
-session_id = os.environ["TMDB_SESSION"]
 v4 = os.environ["TMDB_V4_TOKEN"]
 access = os.environ["TMDB_V4_ACCESS"]
 username = os.environ["TMDB_USERNAME"]
@@ -54,11 +53,12 @@ class APITests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.api = TMDbAPIs(apikey, v4_access_token=access, session_id=session_id)
+        cls.api = TMDbAPIs(apikey, v4_access_token=access)
+        cls.api.authenticate(username, password)
         cls.api_v4 = TMDbAPIs(apikey, v4_access_token=access)
         cls.api_v3_session = TMDbAPIs(apikey)
         cls.api_v4_session = TMDbAPIs(apikey)
-        cls.raw = API3(apikey, session_id=session_id)
+        cls.raw = API3(apikey, session_id=cls.api.session_id)
 
     def test_aa_session(self):
         self.assertIsNotNone(self.api_v4.session_id)
@@ -114,7 +114,7 @@ class APITests(unittest.TestCase):
 
     def test_ab_variables(self):
         print("\ntest_ab_variables: ", end="")
-        self.assertEqual(self.api.session_id, session_id)
+        self.assertIsNotNone(self.api.session_id)
         self.assertIsNotNone(self.api.v4_access_token)
         self.assertEqual(self.api.account_id, 8568268)
         self.assertEqual(self.api.v4_account_id, "5d339fb42f8d097bccd118c7")
