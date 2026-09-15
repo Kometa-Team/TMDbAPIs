@@ -18,7 +18,6 @@ load_dotenv()
 
 apikey = os.environ["TMDB_APIKEY"]
 session_id = os.environ["TMDB_SESSION"]
-v4 = os.environ["TMDB_V4_TOKEN"]
 access = os.environ["TMDB_V4_ACCESS"]
 gh_token = os.environ["PAT"]
 local = os.environ["LOCAL"] == "True"
@@ -89,7 +88,7 @@ class APITests(unittest.TestCase):
         # a URL and click allow), which TMDb requires for write access.
         with self.assertRaises(Authentication):
             self.api_v4_session.v4_approved()
-        self.api_v4_session.v4_access(v4)
+        self.api_v4_session.v4_access(access)
         v4_url = self.api_v4_session.v4_authenticate()
         repo = None
         if local:
