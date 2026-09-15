@@ -33,10 +33,9 @@ jobs:
       - name: Run Tests
         env:
           TMDB_APIKEY: ${{ secrets.TMDB_APIKEY }}
+          TMDB_SESSION: ${{ secrets.TMDB_SESSION }}
           TMDB_V4_ACCESS: ${{ secrets.TMDB_V4_ACCESS }}
           TMDB_V4_TOKEN: ${{ secrets.TMDB_V4_TOKEN }}
-          TMDB_USERNAME: ${{ secrets.TMDB_USERNAME }}
-          TMDB_PASSWORD: ${{ secrets.TMDB_PASSWORD }}
           PAT: ${{ secrets.PAT }}
           LOCAL: False
         run: coverage run -m pytest -s --cov tmdbapis --cov-report xml tests/test*
