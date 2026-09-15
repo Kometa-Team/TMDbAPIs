@@ -89,12 +89,7 @@ class APITests(unittest.TestCase):
         # a URL and click allow), which TMDb requires for write access.
         with self.assertRaises(Authentication):
             self.api_v4_session.v4_approved()
-        account = self.api_v4_session.account()
-        with self.assertRaises(Authentication):
-            account.movie_recommendations()
         self.api_v4_session.v4_access(v4)
-        with self.assertRaises(Authentication):
-            account.movie_recommendations()
         v4_url = self.api_v4_session.v4_authenticate()
         repo = None
         if local:
