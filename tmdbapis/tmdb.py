@@ -256,16 +256,18 @@ class TMDbAPIs:
             cast = []
             for role in value["roles"]:
                 new_dict = value.copy()
-                for k, v in role.items():
-                    new_dict[k] = v
+                if isinstance(role, dict):
+                    for k, v in role.items():
+                        new_dict[k] = v
                 cast.append(Credit(self, new_dict, credit_type="cast", media_type="tv"))
             return cast
         elif value_type == "agg_tv_crew":
             crew = []
             for role in value["jobs"]:
                 new_dict = value.copy()
-                for k, v in role.items():
-                    new_dict[k] = v
+                if isinstance(role, dict):
+                    for k, v in role.items():
+                        new_dict[k] = v
                 crew.append(Credit(self, new_dict, credit_type="crew", media_type="tv"))
             return crew
         elif value_type == "keyword":
