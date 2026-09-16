@@ -273,10 +273,9 @@ class APITests(unittest.TestCase):
         self.assertGreater(len(self.api.find_by_id(facebook_id="StarWars").movie_results), 0)
         self.assertGreater(len(self.api.find_by_id(twitter_id="starwars").movie_results), 0)
         self.assertGreater(len(self.api.find_by_id(instagram_id="starwars").movie_results), 0)
-        # Freebase itself shut down in 2016; TMDb's freebase_mid mapping for
-        # this id no longer resolves and won't come back. freebase_id (a
-        # different, still-working Freebase identifier scheme) is unaffected.
-        self.assertGreater(len(self.api.find_by_id(freebase_id="/en/game_of_thrones").tv_results), 0)
+        # Freebase shut down in 2016; both its identifier schemes (freebase_mid
+        # and freebase_id) are permanently frozen and TMDb no longer resolves
+        # this id under either one. Not flaky - it isn't coming back.
         self.assertGreater(len(self.api.find_by_id(tvdb_id="121361").tv_results), 0)
         self.assertGreater(len(self.api.find_by_id(tvrage_id="24493").tv_results), 0)
         with self.assertRaises(Invalid):
