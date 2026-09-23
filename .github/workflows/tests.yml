@@ -26,8 +26,8 @@ jobs:
       - name: Install Requirements
         run: |
           python -c "import sys; print(sys.version)"
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
+          python -m pip install -r requirements.txt
+          python -m pip install -r requirements-dev.txt
           python -m pip install -e .
 
       - name: Run Tests

@@ -1,6 +1,13 @@
-import os, tmdbapis
+import os
 
 from setuptools import setup, find_packages
+
+PACKAGE_NAME = "tmdbapis"
+DESCRIPTION = "A lightweight Python library for The V3 TMDb APIs."
+URL = "https://github.com/Kometa-Team/TMDbAPIs"
+AUTHOR = "meisnate12"
+AUTHOR_EMAIL = "kometateam@proton.me"
+LICENSE = "MIT License"
 
 with open("README.rst", "r") as f:
     long_descr = f.read()
@@ -15,14 +22,14 @@ if os.path.exists("VERSION"):
                 break
 
 setup(
-    name=tmdbapis.__package_name__,
+    name=PACKAGE_NAME,
     version=__version__,
-    description=tmdbapis.__description__,
+    description=DESCRIPTION,
     long_description=long_descr,
-    url=tmdbapis.__url__,
-    author=tmdbapis.__author__,
-    author_email=tmdbapis.__email__,
-    license=tmdbapis.__license__,
+    url=URL,
+    author=AUTHOR,
+    author_email=AUTHOR_EMAIL,
+    license=LICENSE,
     packages=find_packages(),
     python_requires=">=3.8",
     keywords=["tmdbapis", "tmdbapi", "tmdb", "wrapper", "api"],
