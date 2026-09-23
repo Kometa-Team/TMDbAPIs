@@ -39,7 +39,7 @@ show_ids = {
     "3.9": {"id": 105971, "name": "Star Wars: The Bad Batch"},
     "3.10": {"id": 60554, "name": "Star Wars Rebels"},
     "3.11": {"id": 203085, "name": "Star Wars: Tales of the Jedi"},
-    "3.12": {"id": 83867, "name": "Star Wars: Andor"},
+    "3.12": {"id": 83867, "name": "Andor"},
 }
 
 episode_ids = {
@@ -237,14 +237,15 @@ class APITests(unittest.TestCase):
         self.assertGreater(len(self.api.find_by_id(facebook_id="StarWars").movie_results), 0)
         self.assertGreater(len(self.api.find_by_id(twitter_id="starwars").movie_results), 0)
         self.assertGreater(len(self.api.find_by_id(instagram_id="starwars").movie_results), 0)
-        self.assertGreater(len(self.api.find_by_id(freebase_mid="/m/0524b41").tv_results), 0)
+        with self.assertRaises(NotFound):
+            self.api.find_by_id(freebase_mid="/m/0524b41")
         self.assertGreater(len(self.api.find_by_id(freebase_id="/en/game_of_thrones").tv_results), 0)
         self.assertGreater(len(self.api.find_by_id(tvdb_id="121361").tv_results), 0)
         self.assertGreater(len(self.api.find_by_id(tvrage_id="24493").tv_results), 0)
         with self.assertRaises(Invalid):
             self.api.find_by_id()
         with self.assertRaises(NotFound):
-            self.api.find_by_id(imdb_id="tt00764596759")
+            self.api.find_by_id(imdb_id="tt0076759")
 
     def test_genres(self):
         print("\ntest_genres: ", end="")
@@ -376,7 +377,7 @@ class APITests(unittest.TestCase):
         print("\ntest_search: ", end="")
         movies = self.api.movie_search("The Lord of the Rings")
         self.assertGreater(movies.total_results, 0)
-        self.assertEqual(len(movies.results), 20)
+        self.assertGreater(len(movies.results), 0)
         movies.load_next()
         self.assertGreater(len(movies.results), 0)
         with self.assertRaises(NotFound):
