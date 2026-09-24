@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from tmdbapis.objs.reload import Configuration
+from tmdbapis.tmdb import TMDbAPIs
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -43,6 +44,42 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(data["timezones"][0]["zones"], ["America/New_York"])
         self.assertIn("images", data)
         self.assertIn("change_keys", data)
+
+
+    @patch("tmdbapis.tmdb.API3")
+    def test_valid_language_initializes_from_separate_configuration_endpoints(self, api3_class):
+        api = api3_class.return_value
+        api.configuration_get_api_configuration.return_value = {
+            "change_keys": ["adult"],
+            "images": {
+                "base_url": "http://image/",
+                "secure_base_url": "https://image/",
+                "backdrop_sizes": [],
+                "logo_sizes": [],
+                "poster_sizes": [],
+                "profile_sizes": [],
+                "still_sizes": []
+            }
+        }
+        api.configuration_get_countries.return_value = [
+            {"iso_3166_1": "US", "english_name": "United States"}
+        ]
+        api.configuration_get_jobs.return_value = [
+            {"department": "Directing", "jobs": ["Director"]}
+        ]
+        api.configuration_get_languages.return_value = [
+            {"iso_639_1": "en", "english_name": "English", "name": "English"}
+        ]
+        api.configuration_get_primary_translations.return_value = ["en-US"]
+        api.configuration_get_timezones.return_value = [
+            {"iso_3166_1": "US", "zones": ["America/New_York"]}
+        ]
+
+        tmdb = TMDbAPIs("test-api-key", language="en")
+
+        self.assertEqual(tmdb.language, "en")
+        self.assertIn("en", tmdb._iso_639_1)
+        self.assertIn("en-US", tmdb._translations)
 
 
 if __name__ == "__main__":
