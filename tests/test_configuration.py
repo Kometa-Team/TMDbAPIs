@@ -1,0 +1,49 @@
+import unittest
+from unittest.mock import MagicMock
+
+from tmdbapis.objs.reload import Configuration
+
+
+class ConfigurationTests(unittest.TestCase):
+
+    def test_full_load_fetches_configuration_resources_separately(self):
+        configuration = Configuration.__new__(Configuration)
+        configuration._api = MagicMock()
+        configuration._api.configuration_get_api_configuration.return_value = {
+            "change_keys": ["adult"],
+            "images": {"base_url": "http://image/"}
+        }
+        configuration._api.configuration_get_countries.return_value = [
+            {"iso_3166_1": "US", "english_name": "United States"}
+        ]
+        configuration._api.configuration_get_jobs.return_value = [
+            {"department": "Directing", "jobs": ["Director"]}
+        ]
+        configuration._api.configuration_get_languages.return_value = [
+            {"iso_639_1": "en", "english_name": "English", "name": "English"}
+        ]
+        configuration._api.configuration_get_primary_translations.return_value = ["en-US"]
+        configuration._api.configuration_get_timezones.return_value = [
+            {"iso_3166_1": "US", "zones": ["America/New_York"]}
+        ]
+
+        data = configuration._full_load()
+
+        configuration._api.configuration_get_api_configuration.assert_called_once_with()
+        configuration._api.configuration_get_countries.assert_called_once_with()
+        configuration._api.configuration_get_jobs.assert_called_once_with()
+        configuration._api.configuration_get_languages.assert_called_once_with()
+        configuration._api.configuration_get_primary_translations.assert_called_once_with()
+        configuration._api.configuration_get_timezones.assert_called_once_with()
+
+        self.assertEqual(data["countries"][0]["iso_3166_1"], "US")
+        self.assertEqual(data["jobs"][0]["department"], "Directing")
+        self.assertEqual(data["languages"][0]["iso_639_1"], "en")
+        self.assertEqual(data["primary_translations"], ["en-US"])
+        self.assertEqual(data["timezones"][0]["zones"], ["America/New_York"])
+        self.assertIn("images", data)
+        self.assertIn("change_keys", data)
+
+
+if __name__ == "__main__":
+    unittest.main()
