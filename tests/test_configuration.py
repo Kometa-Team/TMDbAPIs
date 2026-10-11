@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 from tmdbapis.objs.reload import Configuration
@@ -6,6 +7,51 @@ from tmdbapis.tmdb import TMDbAPIs
 
 
 class ConfigurationTests(unittest.TestCase):
+
+    def test_date_parser_accepts_tmdb_timestamp_variants(self):
+        tmdb = TMDbAPIs.__new__(TMDbAPIs)
+        expected = datetime(2026, 10, 11, 12, 30, 45)
+
+        for value in (
+            "2026-10-11 12:30:45 UTC",
+            "2026-10-11 12:30:45 UT",
+            "2026-10-11T12:30:45Z",
+            "2026-10-11T12:30:45.123Z",
+        ):
+            self.assertEqual(tmdb._parse(data=value, value_type="date"), expected)
+        self.assertEqual(tmdb._parse(data="2026-10-11", value_type="date"), datetime(2026, 10, 11))
+        self.assertIsNone(tmdb._parse(data="not-a-date", value_type="date"))
+
+    def test_genre_requests_use_the_client_language(self):
+        tmdb = TMDbAPIs.__new__(TMDbAPIs)
+        tmdb._api = MagicMock()
+        tmdb._parse = MagicMock(side_effect=[["movie"], ["tv"]])
+        tmdb._language = "fr-FR"
+        tmdb._movie_genres = None
+        tmdb._tv_genres = None
+
+        self.assertEqual(tmdb.movie_genres(), ["movie"])
+        self.assertEqual(tmdb.tv_genres(), ["tv"])
+        tmdb._api.genres_get_movie_list.assert_called_once_with(language="fr-FR")
+        tmdb._api.genres_get_tv_list.assert_called_once_with(language="fr-FR")
+
+    def test_language_change_invalidates_genre_caches(self):
+        tmdb = TMDbAPIs.__new__(TMDbAPIs)
+        tmdb._language = "en"
+        tmdb._iso_639_1 = {"en": object()}
+        tmdb._translations = {"fr-fr": "fr-FR"}
+        tmdb._movie_genres = object()
+        tmdb._movie_genre_lookups = object()
+        tmdb._tv_genres = object()
+        tmdb._tv_genre_lookups = object()
+
+        tmdb.language = "fr-FR"
+
+        self.assertEqual(tmdb.language, "fr-FR")
+        self.assertIsNone(tmdb._movie_genres)
+        self.assertIsNone(tmdb._movie_genre_lookups)
+        self.assertIsNone(tmdb._tv_genres)
+        self.assertIsNone(tmdb._tv_genre_lookups)
 
     def test_full_load_fetches_configuration_resources_separately(self):
         configuration = Configuration.__new__(Configuration)
