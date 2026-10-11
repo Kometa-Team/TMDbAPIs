@@ -257,7 +257,13 @@ class Configuration(TMDbReload):
         return "countries,jobs,languages,primary_translations,timezones"
 
     def _full_load(self, partial=None):
-        return self._api.configuration_get_api_configuration(append_to_response=partial)
+        data = self._api.configuration_get_api_configuration()
+        data["countries"] = self._api.configuration_get_countries()
+        data["jobs"] = self._api.configuration_get_jobs()
+        data["languages"] = self._api.configuration_get_languages()
+        data["primary_translations"] = self._api.configuration_get_primary_translations()
+        data["timezones"] = self._api.configuration_get_timezones()
+        return data
 
 
 class Credit(TMDbReload):
