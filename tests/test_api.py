@@ -126,7 +126,11 @@ class APITests(unittest.TestCase):
         # live credentials instead of whatever was passed in at setUpClass.
         fresh_session_id = self.api_v4_session.session_id
         fresh_v4_token = self.api_v4_session.v4_access_token
-        fresh_account_id = self.api_v4_session._api4.account_id
+        # Confirm that TMDb accepts the v3 session before using it elsewhere.
+        # This catches an API-key/token pair from different TMDb applications
+        # at the authentication step instead of failing later in every write
+        # test with an opaque 401 response.
+        fresh_account_id = self.api_v4_session.account_id
 
         self.api._api._session_id = fresh_session_id
         self.api._api4.access_token = fresh_v4_token
@@ -139,7 +143,7 @@ class APITests(unittest.TestCase):
         # rare event instead of something that needs to be repeated.
         if repo is not None:
             repo.create_secret("TMDB_SESSION", fresh_session_id)
-            repo.create_secret("TMDB_V4_TOKEN", fresh_v4_token)
+            repo.create_secret("TMDB_V4_ACCESS", fresh_v4_token)
 
         print("\ntest_aa_session: ", end="")
 
