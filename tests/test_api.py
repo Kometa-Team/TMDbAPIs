@@ -17,10 +17,10 @@ logger.addHandler(logging.StreamHandler())
 load_dotenv()
 
 apikey = os.environ["TMDB_APIKEY"]
-session_id = os.environ["TMDB_SESSION"]
+session_id = os.environ.get("TMDB_SESSION")
 access = os.environ["TMDB_V4_ACCESS"]
-gh_token = os.environ["PAT"]
-local = os.environ["LOCAL"] == "True"
+gh_token = os.environ.get("PAT")
+local = os.environ.get("LOCAL", "False").lower() == "true"
 py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 
 movie_ids = {
@@ -46,6 +46,12 @@ episode_ids = {
     "3.11": {"id": 4, "name": "Destroy Malevolence"},
     "3.12": {"id": 5, "name": "Rookies"},
 }
+
+# Reuse the latest maintained fixtures on newer Python versions. The fixtures
+# describe TMDb data, not Python-version-specific behaviour.
+fixture_version = py_version if py_version in movie_ids else max(
+    movie_ids, key=lambda version: tuple(map(int, version.split(".")))
+)
 
 class APITests(unittest.TestCase):
 
@@ -82,10 +88,10 @@ class APITests(unittest.TestCase):
         self.assertIsInstance(results, list)
 
     def test_aa_session(self):
-        # A plain V4-read-only client has no session and no write access, so
-        # deriving a session from it must fail.
+        # The persisted V4 token can be a user write token after a prior run,
+        # so use an actually unconfigured client for this authentication test.
         with self.assertRaises(Authentication):
-            print(self.api_v4.session_id)
+            print(TMDbAPIs(apikey).session_id)
 
         self.api_v3_session.language = "en"
         self.assertEqual(self.api_v3_session.language, "en")
@@ -119,8 +125,10 @@ class APITests(unittest.TestCase):
             print(f"\n\nApprove URL: {v4_url}")
             with open("url.txt", "w") as file1:
                 file1.write(v4_url)
-            time.sleep(120)
+            input("Approve the URL, then press Enter to continue: ")
         else:
+            if not gh_token:
+                raise RuntimeError("PAT is required when LOCAL is not True")
             git = Github(auth=Auth.Token(gh_token))
             repo = git.get_user("Kometa-Team").get_repo("TMDbAPIs")
             issue_id = repo.create_issue(f"Run: {datetime.now().strftime('%Y-%m-%d %H:%M')} {py_version}", body=v4_url,
@@ -358,9 +366,9 @@ class APITests(unittest.TestCase):
             self.api.movie(10)
         with self.assertRaises(Invalid):
             self.api.now_playing_movies(region="fail")
-        movie = self.api.movie(movie_ids[py_version]["id"])
+        movie = self.api.movie(movie_ids[fixture_version]["id"])
         self.assertIsNotNone(str(movie.watch_providers))
-        self.assertEqual(movie.title, movie_ids[py_version]["name"])
+        self.assertEqual(movie.title, movie_ids[fixture_version]["name"])
         self.assertIsInstance(self.api.latest_movie(), Movie)
         self.assertGreater(len(self.api.now_playing_movies(region="us")), 0)
         self.assertGreater(len(self.api.popular_movies(region=self.api._iso_3166_1["us"])), 0)
@@ -481,8 +489,8 @@ class APITests(unittest.TestCase):
 
     def test_tv_episode(self):
         print("\ntest_tv_episode: ", end="")
-        episode = self.api.tv_episode(4194, 1, episode_ids[py_version]["id"])
-        self.assertEqual(episode.name, episode_ids[py_version]["name"])
+        episode = self.api.tv_episode(4194, 1, episode_ids[fixture_version]["id"])
+        self.assertEqual(episode.name, episode_ids[fixture_version]["name"])
         with self.assertRaises(Invalid):
             episode.rate(11.0)
         episode.rate(8.5)
@@ -508,8 +516,8 @@ class APITests(unittest.TestCase):
 
     def test_tv_show(self):
         print("\ntest_tv_show: ", end="")
-        show = self.api.tv_show(show_ids[py_version]["id"])
-        self.assertEqual(show.name, show_ids[py_version]["name"])
+        show = self.api.tv_show(show_ids[fixture_version]["id"])
+        self.assertEqual(show.name, show_ids[fixture_version]["name"])
         self.assertIsInstance(self.api.latest_tv(), TVShow)
         self.assertGreater(len(self.api.tv_airing_today()), 0)
         self.assertGreater(len(self.api.tv_on_the_air()), 0)
@@ -522,8 +530,7 @@ class APITests(unittest.TestCase):
         show.mark_as_favorite()
         time.sleep(2)
         show.add_to_watchlist()
-        time.sleep(2)
-        show.reload()
+        self._wait_for_reload(show, lambda s: s.rated == 8.5 and s.favorite and s.watchlist)
         self.assertEqual(show.rated, 8.5)
         self.assertTrue(show.favorite)
         self.assertTrue(show.watchlist)
