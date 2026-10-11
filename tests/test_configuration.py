@@ -79,7 +79,8 @@ class ConfigurationTests(unittest.TestCase):
 
         self.assertEqual(tmdb.language, "en")
         self.assertIn("en", tmdb._iso_639_1)
-        self.assertIn("en-US", tmdb._translations)
+        self.assertIn("en-us", tmdb._translations)
+        self.assertEqual(tmdb._translations["en-us"], "en-US")
 
         tmdb.language = "en-US"
         self.assertEqual(tmdb.language, "en-US")
