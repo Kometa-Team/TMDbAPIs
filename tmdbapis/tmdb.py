@@ -186,12 +186,21 @@ class TMDbAPIs:
         elif value_type == "date":
             if not value:
                 return None
-            elif " UT" in value:
-                return datetime.strptime(value[:-1].split(".")[0], "%Y-%m-%d %H:%M:%S UT")
-            elif "T" in value:
-                return datetime.strptime(value[:-1].split(".")[0], "%Y-%m-%dT%H:%M:%S")
-            else:
-                return datetime.strptime(value, "%Y-%m-%d")
+            # TMDb has returned date-only values plus several timestamp
+            # variants. Keep this parser tolerant so one unexpected value
+            # does not prevent an otherwise valid object from loading.
+            clean = str(value).strip()
+            for suffix in (" UTC", " UT"):
+                if clean.endswith(suffix):
+                    clean = clean[:-len(suffix)].strip()
+                    break
+            clean = clean.rstrip("Z").split(".")[0]
+            for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+                try:
+                    return datetime.strptime(clean, fmt)
+                except ValueError:
+                    continue
+            return None
         elif value_type == "dict":
             return value
         elif value_type == "alternative_name":
@@ -436,6 +445,12 @@ class TMDbAPIs:
                 self._language = self._validate_translation(lang)
             except Invalid:
                 raise Invalid(f"Language: {lang} is invalid see Configuration.languages and Configuration.primary_translations for the options.")
+        # Genres are localized responses, so a language change invalidates
+        # both their lists and the ID-based lookup caches built from them.
+        self._movie_genres = None
+        self._movie_genre_lookups = None
+        self._tv_genres = None
+        self._tv_genre_lookups = None
 
     @property
     def account_id(self):
@@ -1115,7 +1130,7 @@ class TMDbAPIs:
                 List[:class:`~tmdbapis.objs.simple.Genre`]
         """
         if reload or self._movie_genres is None:
-            self._movie_genres = self._parse(data=self._api.genres_get_movie_list(),
+            self._movie_genres = self._parse(data=self._api.genres_get_movie_list(language=self.language),
                                              attrs="genres", value_type="load_genre", is_list=True)
         return self._movie_genres
 
@@ -1129,7 +1144,7 @@ class TMDbAPIs:
                 List[:class:`~tmdbapis.objs.simple.Genre`]
         """
         if reload or self._tv_genres is None:
-            self._tv_genres = self._parse(data=self._api.genres_get_tv_list(),
+            self._tv_genres = self._parse(data=self._api.genres_get_tv_list(language=self.language),
                                           attrs="genres", value_type="load_genre", is_list=True)
         return self._tv_genres
 
