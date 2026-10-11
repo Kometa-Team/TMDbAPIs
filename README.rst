@@ -132,7 +132,7 @@ To load the authenticated session use the ``session_id`` Parameter of the `TMDbA
 Adding TMDb V4 API Read Access Token
 ----------------------------------------------------------
 
-To gain read access to TMDb V4's API just provide you're TMDb V4 Access Token either using the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or by using the `v4_access_token() <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
+To gain read access to TMDb V4's API, provide your TMDb V4 Access Token either using the ``v4_access_token`` Parameter of the `TMDbAPIs <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs>`_ constructor or by using the `v4_access_token() <https://tmdbapis.kometa.wiki/en/latest/objapi.html#tmdbapis.tmdb.TMDbAPIs.v4_access_token>`_ method.
 
 To gain read access to TMDb V4's API need your TMDb V4 Access Token, which can be found following `this guide <https://developers.themoviedb.org/3/getting-started/introduction>`_.
 

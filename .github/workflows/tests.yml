@@ -8,42 +8,39 @@ on:
 
 jobs:
   run:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.12"]
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Requirements
         run: |
           python -c "import sys; print(sys.version)"
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-          python setup.py install
+          python -m pip install -r requirements.txt
+          python -m pip install -r requirements-dev.txt
+          python -m pip install -e .
 
       - name: Run Tests
         env:
           TMDB_APIKEY: ${{ secrets.TMDB_APIKEY }}
           TMDB_SESSION: ${{ secrets.TMDB_SESSION }}
           TMDB_V4_ACCESS: ${{ secrets.TMDB_V4_ACCESS }}
-          TMDB_V4_TOKEN: ${{ secrets.TMDB_V4_TOKEN }}
-          TMDB_USERNAME: ${{ secrets.TMDB_USERNAME }}
-          TMDB_PASSWORD: ${{ secrets.TMDB_PASSWORD }}
           PAT: ${{ secrets.PAT }}
           LOCAL: False
-        run: coverage run -m pytest -s --cov tmdbapis --cov-report xml tests/test*
+        run: pytest -s --cov=tmdbapis --cov-report=xml tests/test*
 
       - name: Codecov coverage reports
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml

@@ -5,25 +5,30 @@ on:
     tags:
       - v*
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
 
       - name: Create Release for new Tag
-        uses: marvinpinto/action-automatic-releases@latest
-        with:
-          title: ${{ secrets.REPO_NAME }} ${{ github.event.ref }}
-          repo_token: ${{ secrets.PAT }}
-          prerelease: false
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "${{ github.event.ref }}"
+          --verify-tag
+          --title "${{ secrets.REPO_NAME }} ${{ github.event.ref }}"
+          --generate-notes
 
       - name: Check Out Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
-          python-version: '3.x'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
