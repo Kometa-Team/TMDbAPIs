@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Check Out Repo
+        uses: actions/checkout@v7
+
       - name: Create Release for new Tag
         env:
           GH_TOKEN: ${{ github.token }}
@@ -21,9 +24,6 @@ jobs:
           --verify-tag
           --title "${{ secrets.REPO_NAME }} ${{ github.event.ref }}"
           --generate-notes
-
-      - name: Check Out Repo
-        uses: actions/checkout@v7
 
       - name: Set up Python
         uses: actions/setup-python@v7
